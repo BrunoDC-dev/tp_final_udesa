@@ -7,9 +7,6 @@ c.finish_registration()
 def inclinacion(inclinacion_x, inclinacion_y):
     if inclinacion_x>0 and inclinacion_y>0:
         #Cuadrante 1
-        if inclinacion_x ==  inclinacion_y:
-            direction = pi/4
-        else:
             diferencia= inclinacion_y-inclinacion_x
             if diferencia >0:
                 porcentaje=  diferencia/inclinacion_x
@@ -19,9 +16,6 @@ def inclinacion(inclinacion_x, inclinacion_y):
                 direction = pi/4 -(pi/4)*(min(porcentaje,1))
     elif inclinacion_x<0 and inclinacion_y>0:
         #Cuadrante 2
-        if abs(inclinacion_x) == inclinacion_y:
-            direction = (3*pi)/4
-        else:
             diferencia = inclinacion_y - abs(inclinacion_x)
             if diferencia>0:
                 porcentaje= diferencia/abs(inclinacion_x)
@@ -31,9 +25,6 @@ def inclinacion(inclinacion_x, inclinacion_y):
                 direction = (3*pi/4)+(pi/4*(min(porcentaje,1)))
     elif inclinacion_x<0 and inclinacion_y<0:
         #Cuadrante 3
-        if inclinacion_x == inclinacion_y:
-            direction = (5*pi)/4
-        else:
             diferencia = abs(inclinacion_y) - abs(inclinacion_x)
             if diferencia>0:
                 porcentaje= diferencia/abs(inclinacion_x)
@@ -43,9 +34,6 @@ def inclinacion(inclinacion_x, inclinacion_y):
                 direction = (5*pi/4)-(pi/4*(min(porcentaje,1)))   
     elif inclinacion_x>0 and inclinacion_y<0:
         #Cuadrante 4
-        if inclinacion_x == inclinacion_y:
-            direction = (7*pi)/4
-        else:
             diferencia = abs(inclinacion_y) - inclinacion_x
             if diferencia>0:
                 porcentaje= diferencia/inclinacion_x
@@ -54,7 +42,6 @@ def inclinacion(inclinacion_x, inclinacion_y):
                 porcentaje= abs(diferencia)/abs(inclinacion_y)
                 direction = (7*pi/4)+(pi/4*(min(porcentaje,1)))          
     return direction
-
 
 while not c.is_over():
     data = c.get_data()
@@ -67,3 +54,4 @@ while not c.is_over():
     else :
        speed = 50   
     c.next_iteration('T1',{'E1':{'direction':direction, 'speed': speed},} )
+
