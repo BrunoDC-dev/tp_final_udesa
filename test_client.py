@@ -1,5 +1,6 @@
 from communication.client.client import MountainClient
 import math
+import time
 pi = math.pi
 class Escalador :
     def __init__(self,nombre,cuadrante) -> None:
@@ -86,6 +87,22 @@ class Escalador :
             return 5*pi/4
         if self.cuadrante==4:
             return 6*pi/4
+    def seguir_A(self,posicion_x_A, posicion_x_B, posicion_y_A, posicion_y_B):
+        if posicion_y_B < posicion_y_A:
+            if posicion_x_B > posicion_x_A:
+                return pi + math.atan((posicion_y_B-posicion_y_A)/(posicion_x_B-posicion_x_A))
+            else:
+               return math.atan((posicion_y_B-posicion_y_A)/(posicion_x_B-posicion_x_A))
+        else:
+            if posicion_x_B > posicion_x_A:
+                return pi + math.atan((posicion_y_B-posicion_y_A)/(posicion_x_B-posicion_x_A))
+            else:
+               return 2*pi + math.atan((posicion_y_B-posicion_y_A)/(posicion_x_B-posicion_x_A))
+    def linea_de_fuego(self, posicon_x, posicion_y):
+        if posicon_x or posicion_y >= 22800:
+            pass
+            
+        
 c= MountainClient()
 c.add_team('T1', ['E1','E2','E3','E4'])
 E1=Escalador("E1", 1)
@@ -95,15 +112,28 @@ E4=Escalador("E4", 4)
 c.finish_registration()
 cuadrante_division=False
 while not c.is_over():
-    data = c.get_data()
-    print(data)
     speed = 50
-    direccionE1= E1.calculate_direction(data['T1'][E1.nombre]['inclinacion_x'],data['T1'][E1.nombre]['inclinacion_y'],data['T1'][E1.nombre]['x'], data['T1'][E1.nombre]['y'])
-    direccionE2= E2.calculate_direction(data['T1'][E2.nombre]['inclinacion_x'],data['T1'][E2.nombre]['inclinacion_y'],data['T1'][E2.nombre]['x'], data['T1'][E2.nombre]['y'])
-    direccionE3= E3.calculate_direction(data['T1'][E3.nombre]['inclinacion_x'],data['T1'][E3.nombre]['inclinacion_y'],data['T1'][E3.nombre]['x'], data['T1'][E3.nombre]['y'])
-    direccionE4= E4.calculate_direction(data['T1'][E4.nombre]['inclinacion_x'],data['T1'][E4.nombre]['inclinacion_y'],data['T1'][E4.nombre]['x'], data['T1'][E4.nombre]['y'])
-    print(direccionE1)
-    c.next_iteration('T1',{E1.nombre:{'direction':direccionE1,'speed':speed},
+    lista_escaladores = [E1, E2, E3, E4]
+    data = c.get_data()
+    direccion = {}
+    e = -1
+    print(data)
+    for escalador in lista_escaladores:
+        e += 1
+        if data['T1'][escalador.nombre]['cima'] == True:
+            llego = escalador
+            for miembro in lista_escaladores.pop(e):
+               direccion[miembro.nombre] = {"direction": Escalador.seguir_A(data['T1'][llego.nombre]['x'],data['T1'][miembro.nombre]['x'],data['T1'][llego.nombre]['y'],data['T1'][miembro.nombre]['y']),
+                                             "speed" : speed} 
+            time.sleep(0.5)
+            c.next_iteration('T1',direccion)
+        else:    
+            direccionE1= E1.calculate_direction(data['T1'][E1.nombre]['inclinacion_x'],data['T1'][E1.nombre]['inclinacion_y'],data['T1'][E1.nombre]['x'], data['T1'][E1.nombre]['y'])
+            direccionE2= E2.calculate_direction(data['T1'][E2.nombre]['inclinacion_x'],data['T1'][E2.nombre]['inclinacion_y'],data['T1'][E2.nombre]['x'], data['T1'][E2.nombre]['y'])
+            direccionE3= E3.calculate_direction(data['T1'][E3.nombre]['inclinacion_x'],data['T1'][E3.nombre]['inclinacion_y'],data['T1'][E3.nombre]['x'], data['T1'][E3.nombre]['y'])
+            direccionE4= E4.calculate_direction(data['T1'][E4.nombre]['inclinacion_x'],data['T1'][E4.nombre]['inclinacion_y'],data['T1'][E4.nombre]['x'], data['T1'][E4.nombre]['y'])
+            c.next_iteration('T1',{E1.nombre:{'direction':direccionE1,'speed':speed},
                            E2.nombre:{'direction':direccionE2,'speed':speed},
                            E3.nombre:{'direction':direccionE3,'speed':speed},
                            E4.nombre:{'direction':direccionE4,'speed':speed}})
+            time.sleep(0.5)
