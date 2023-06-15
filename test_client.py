@@ -119,17 +119,17 @@ while not c.is_over():
     speed = 50
     lista_escaladores = [E1, E2, E3, E4]
     data = c.get_data()
-    direccion = {}
-    e = -1
     print(data)
+    direccion = {}
     for escalador in lista_escaladores:
-        e += 1
         if data['T1'][escalador.nombre]['cima'] == True:
             llego = escalador
-            for miembro in lista_escaladores.pop(e):
-               direccion[miembro.nombre] = {"direction": Escalador.seguir_A(data['T1'][llego.nombre]['x'],data['T1'][miembro.nombre]['x'],data['T1'][llego.nombre]['y'],data['T1'][miembro.nombre]['y']),
+
+            lista_escaladores.remove(escalador)
+            for miembro in lista_escaladores:
+               direccion[miembro.nombre] = {"direction": miembro.seguir_A(data['T1'][llego.nombre]['x'],data['T1'][miembro.nombre]['x'],data['T1'][llego.nombre]['y'],data['T1'][miembro.nombre]['y']),
                                              "speed" : speed} 
-            time.sleep(0.5)
+            time.sleep(0)
             c.next_iteration('T1',direccion)
         else:    
             direccionE1= E1.calculate_direction(data['T1'][E1.nombre]['inclinacion_x'],data['T1'][E1.nombre]['inclinacion_y'],data['T1'][E1.nombre]['x'], data['T1'][E1.nombre]['y'])
@@ -140,4 +140,4 @@ while not c.is_over():
                            E2.nombre:{'direction':direccionE2,'speed':speed},
                            E3.nombre:{'direction':direccionE3,'speed':speed},
                            E4.nombre:{'direction':direccionE4,'speed':speed}})
-            time.sleep(0.5)
+            time.sleep(0)
