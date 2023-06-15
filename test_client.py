@@ -64,9 +64,13 @@ class Escalador :
                 porcentaje= abs(diferencia)/abs(inclinacion_y)
                 direction = (7*pi/4)+(pi/4*(min(porcentaje,1)))          
         return direction
+    
+    
     def set_maximo(self,valor):
         if self.maximo < valor:
             self.maximo = valor
+
+
     def __lt__(self,other):
         if self.maximo < other.maximo:
             return self.get_to_center()
@@ -88,10 +92,10 @@ class Escalador :
             return 6*pi/4
 c= MountainClient()
 c.add_team('T1', ['E1','E2','E3','E4'])
-E1=Escalador("E1", 1)
-E2=Escalador("E2", 2)
+E1=Escalador("E1",1)
+E2=Escalador("E2",2)
 E3=Escalador("E3",3)
-E4=Escalador("E4", 4)
+E4=Escalador("E4",4)
 c.finish_registration()
 cuadrante_division=False
 while not c.is_over():
