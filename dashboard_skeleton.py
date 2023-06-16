@@ -7,7 +7,7 @@ from matplotlib.backends.backend_tkagg import FigureCanvasTkAgg, NavigationToolb
 import matplotlib.pyplot as plt
 from matplotlib.animation import FuncAnimation
 import mpl_toolkits.mplot3d.axes3d as p3
-
+import numpy as np
 from communication.client.client import MountainClient
 
 
@@ -26,16 +26,50 @@ class Dashboard:
 
     def visualization_example(self, frame):
 	    # Code for visualization plot
-        print(self.data)
-        fig, ax = plt.subplots()
-        # code for plot
 
-        def animate(i):
-            # code for animation
-            pass
+# Create the figure and axis objects
+        fig = plt.figure()
+        ax = fig.add_subplot(111, projection='3d')
 
+# Define the circle parameters
+        radius = 23
+        theta = np.linspace(0, 2 * np.pi, 100)  # Angle values from 0 to 2*pi
 
-        self.animations.append(FuncAnimation(fig, func=animate, interval=self.time_step, blit=True))
+# Generate the circle points
+        x = radius * np.cos(theta)
+        y = radius * np.sin(theta)
+
+# Plot the circle base
+        circle = ax.plot(x, y, zs=0, zdir='z', label='Circle Base')
+
+# Initialize empty arrays for points
+        points_x = []
+        points_y = []
+        points_z = []
+
+# Function to add points in each animation frame
+        def add_points(frame):
+    # Generate four random points
+            new_points_x = np.random.uniform(-radius, radius, 4)
+            new_points_y = np.random.uniform(-radius, radius, 4)
+            new_points_z = np.random.rand(4) * 50
+
+    # Add the new points to the existing arrays
+            points_x.extend(new_points_x)
+            points_y.extend(new_points_y)
+            points_z.extend(new_points_z)
+
+    # Plot all points
+            ax.scatter(points_x, points_y, points_z, c='r', marker='o', label='Random Points')
+
+# Set labels and legend
+        ax.set_xlabel('X')
+        ax.set_ylabel('Y')
+        ax.set_zlabel('Z')
+        ax.legend()
+
+# Create the animation
+        self.animation = FuncAnimation(fig, add_points, frames=25, interval=200)
         
         canvas = FigureCanvasTkAgg(fig, frame)
         toolbar = NavigationToolbar2Tk(canvas, frame)
