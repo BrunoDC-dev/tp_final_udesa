@@ -121,7 +121,8 @@ def find_entry_with_cima(data):
                 return entry
     return False
         
-c= MountainClient()
+#c= MountainClient('10.42.0.1',8888)
+c=MountainClient()
 c.add_team('T1', ['E1','E2','E3','E4'])
 E1=Escalador("E1",1)
 E2=Escalador("E2",2)

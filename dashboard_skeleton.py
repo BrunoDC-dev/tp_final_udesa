@@ -20,12 +20,13 @@ class Dashboard:
         self.time_step = 500 # ms
         self.animations = [] # for animations to stay alive in memory
         self.figsize = (4.5, 3)
-
-        # self.visualization_example(...)
+        self.frame = Frame(self.root)
+        self.visualization_example(self.frame)
 
 
     def visualization_example(self, frame):
 	    # Code for visualization plot
+        print(self.data)
         fig, ax = plt.subplots()
         # code for plot
 
