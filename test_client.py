@@ -135,8 +135,9 @@ while not c.is_over():
     lista_escaladores = [E1, E2, E3, E4]
     direccion = {}
     data = c.get_data()
-    print(data)
+    #print(data)
     cima=find_entry_with_cima(data)
+    time.sleep(0.5)
     if cima== False:
             for escalador in lista_escaladores:
                  direccion[escalador.nombre] = {'direction': escalador.calculate_direction(data['T1'][escalador.nombre]['inclinacion_x'],
@@ -159,5 +160,4 @@ while not c.is_over():
                                                                                data['T1'][cima]['y'],
                                                                                data['T1'][escalador.nombre]['y']),
                                                                                'speed' : speed} 
-    time.sleep(0)
     c.next_iteration('T1',direccion)
