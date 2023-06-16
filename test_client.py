@@ -65,9 +65,13 @@ class Escalador :
                 porcentaje= abs(diferencia)/abs(inclinacion_y)
                 direction = (7*pi/4)+(pi/4*(min(porcentaje,1)))          
         return direction
+    
+    
     def set_maximo(self,valor):
         if self.maximo < valor:
             self.maximo = valor
+
+
     def __lt__(self,other):
         if self.maximo < other.maximo:
             return self.get_to_center()
@@ -98,42 +102,61 @@ class Escalador :
                 return pi + math.atan((posicion_y_B-posicion_y_A)/(posicion_x_B-posicion_x_A))
             else:
                return 2*pi + math.atan((posicion_y_B-posicion_y_A)/(posicion_x_B-posicion_x_A))
+    def calcular_angulo(self,posicion_x_A, posicion_x_B, posicion_y_A, posicion_y_B):
+        dx = posicion_x_A - posicion_x_B
+        dy = posicion_y_A - posicion_y_B
+        angulo_radianes = math.atan2(dy, dx)
+        angulo_ajustado = math.fmod(angulo_radianes, (2*math.pi))
+        if angulo_ajustado < 0:
+            angulo_ajustado += 2*math.pi
+        return angulo_ajustado
     def linea_de_fuego(self, posicon_x, posicion_y):
         if posicon_x or posicion_y >= 22800:
             pass
-            
+    
+def find_entry_with_cima(data):
+    for territory, territory_values in data.items():
+        for entry, entry_values in territory_values.items():
+            if entry_values.get('cima', False):
+                return entry
+    return False
         
 c= MountainClient()
 c.add_team('T1', ['E1','E2','E3','E4'])
-E1=Escalador("E1", 1)
-E2=Escalador("E2", 2)
+E1=Escalador("E1",1)
+E2=Escalador("E2",2)
 E3=Escalador("E3",3)
-E4=Escalador("E4", 4)
+E4=Escalador("E4",4)
 c.finish_registration()
 cuadrante_division=False
 while not c.is_over():
     speed = 50
     lista_escaladores = [E1, E2, E3, E4]
-    data = c.get_data()
     direccion = {}
-    e = -1
+    data = c.get_data()
     print(data)
-    for escalador in lista_escaladores:
-        e += 1
-        if data['T1'][escalador.nombre]['cima'] == True:
-            llego = escalador
-            for miembro in lista_escaladores.pop(e):
-               direccion[miembro.nombre] = {"direction": Escalador.seguir_A(data['T1'][llego.nombre]['x'],data['T1'][miembro.nombre]['x'],data['T1'][llego.nombre]['y'],data['T1'][miembro.nombre]['y']),
-                                             "speed" : speed} 
-            time.sleep(0.5)
-            c.next_iteration('T1',direccion)
-        else:    
-            direccionE1= E1.calculate_direction(data['T1'][E1.nombre]['inclinacion_x'],data['T1'][E1.nombre]['inclinacion_y'],data['T1'][E1.nombre]['x'], data['T1'][E1.nombre]['y'])
-            direccionE2= E2.calculate_direction(data['T1'][E2.nombre]['inclinacion_x'],data['T1'][E2.nombre]['inclinacion_y'],data['T1'][E2.nombre]['x'], data['T1'][E2.nombre]['y'])
-            direccionE3= E3.calculate_direction(data['T1'][E3.nombre]['inclinacion_x'],data['T1'][E3.nombre]['inclinacion_y'],data['T1'][E3.nombre]['x'], data['T1'][E3.nombre]['y'])
-            direccionE4= E4.calculate_direction(data['T1'][E4.nombre]['inclinacion_x'],data['T1'][E4.nombre]['inclinacion_y'],data['T1'][E4.nombre]['x'], data['T1'][E4.nombre]['y'])
-            c.next_iteration('T1',{E1.nombre:{'direction':direccionE1,'speed':speed},
-                           E2.nombre:{'direction':direccionE2,'speed':speed},
-                           E3.nombre:{'direction':direccionE3,'speed':speed},
-                           E4.nombre:{'direction':direccionE4,'speed':speed}})
-            time.sleep(0.5)
+    cima=find_entry_with_cima(data)
+    if cima== False:
+            for escalador in lista_escaladores:
+                 direccion[escalador.nombre] = {'direction': escalador.calculate_direction(data['T1'][escalador.nombre]['inclinacion_x'],
+                                                data['T1'][escalador.nombre]['inclinacion_y'],
+                                                data['T1'][escalador.nombre]['x'],
+                                                data['T1'][escalador.nombre]['y']),
+                                                'speed' : speed} 
+    else:
+
+        for escalador in lista_escaladores:
+            if escalador.nombre ==cima:
+                direccion[escalador.nombre] = {'direction': escalador.calculate_direction(data['T1'][escalador.nombre]['inclinacion_x'],
+                                                data['T1'][escalador.nombre]['inclinacion_y'],
+                                                data['T1'][escalador.nombre]['x'],
+                                                data['T1'][escalador.nombre]['y']),
+                                                'speed' : speed} 
+            else:
+                direccion[escalador.nombre] = {'direction': escalador.seguir_A(data['T1'][cima]['x'],
+                                                                               data['T1'][escalador.nombre]['x'],
+                                                                               data['T1'][cima]['y'],
+                                                                               data['T1'][escalador.nombre]['y']),
+                                                                               'speed' : speed} 
+    time.sleep(0)
+    c.next_iteration('T1',direccion)
