@@ -58,11 +58,27 @@ class TCPHandler(BaseRequestHandler):
                 Returns: True if the competition is over, False otherwise.
                 Example: {"command": "is_over"}
 
+            - is_registering_teams: returns True if the competition is registering teams.
+                Args: The JSON does not need any other field.
+                Returns: True if the competition is registering teams, False otherwise.
+                Example: {"command": "is_registering_teams"}
+
+            - get_mountain: returns the mountain information.
+                Args: The JSON does not need any other field.
+                Returns: A JSON with the following fields:
+                    {"mountain": (str)}
+                Example: {"command": "get_mountain"}
+
         """
 
 
         self.data = bytes.decode(self.request.recv(1024).strip(), 'utf-8')
-        self.data = json.loads(self.data)
+        try:
+            self.data = json.loads(self.data)
+        except:
+            logger.warn('Invalid request. It may be too long. It will be ignored.')
+            return 'NACK'
+        
         logger.debug(f"Received request")
         logger.debug(f"Received data: {self.data}")
         
@@ -87,6 +103,8 @@ class TCPHandler(BaseRequestHandler):
             ans = not self.server.base_station.is_competition_ongoing()
         elif self.data['command'] == 'is_registering_teams':
             ans = self.server.base_station.is_registering_teams()
+        elif self.data['command'] == 'get_mountain':
+            ans = self.server.base_station.get_mountain()
         else:
             logger.debug(f"Unknown command: {self.data['command']}")
             ans = 'NACK'

@@ -156,6 +156,22 @@ class MountainClient:
         data = json.dumps(data) 
         ans = self._socket_send(data)
         return ans == 'True'
+    
+    def get_mountain(self) -> str:
+        """Sends the get_mountain command to the MountainServer.
+
+        Returns:
+            str: The name of the mountain.
+
+        Example:
+            >>> client.get_mountain()
+            'EasyMountain'
+        """
+
+        data = {'command': 'get_mountain'}
+        data = json.dumps(data) 
+        ans = self._socket_send(data)
+        return ans
 
     def _socket_send(self, data: str) -> str:
         """Sends the data to the server using a socket.
@@ -192,4 +208,5 @@ class MountainClient:
             s.close()
 
         return received
+
 
