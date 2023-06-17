@@ -1,6 +1,6 @@
 """DO NOT MODIFY THIS FILE"""
 
-from communication.server.mountain.mountain import Mountain
+from communication.server.mountain.abstract.mountain import Mountain
 from typing import List
 import math
 import threading
@@ -144,6 +144,11 @@ class BaseStation:
         if self.state == 'over':
             return False
         
+        if self.minutes_passed >= 10080: # 1 semana
+            self.state = 'over'
+            logger.info('Competition is over. Hikers have already been 1 week in the mountain. We are calling them back')
+            return False
+        
         every_team_in_summit = True
         for team in list(self.teams.keys()):
             all_hikers_in_summit = True
@@ -172,6 +177,9 @@ class BaseStation:
         Returns:
             int: the minutes passed since the competition started."""
         return self.minutes_passed
+    
+    def get_mountain(self) -> str:
+        return str(self.mountain).split(' ')[0].split('.')[-1]
 
     def _set_server(self, server):
         self.server = server

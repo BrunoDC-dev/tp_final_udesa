@@ -8,19 +8,23 @@ class Escalador :
         self.cuadrante=cuadrante 
         self.maximo =0
         self.in_cuadrante=False
+        self.peligro=False
     
     def is_incuadrante(self, posicion_x , posicion_y):
-        if self.cuadrante==1 and posicion_x>=14000 and posicion_y>=14000:
+        if self.cuadrante==1 and posicion_x>=15000 and posicion_y>=15000:
             self.in_cuadrante=True
-        elif self.cuadrante==2 and posicion_x<=-14000 and posicion_y>=14000:
+        elif self.cuadrante==2 and posicion_x<=-15000 and posicion_y>=15000:
             self.in_cuadrante=True
-        elif self.cuadrante==3 and posicion_x<=-14000 and posicion_y<=-14000:
+        elif self.cuadrante==3 and posicion_x<=-15000 and posicion_y<=-15000:
             self.in_cuadrante=True
-        elif self.cuadrante==4 and posicion_x>=14000 and posicion_y<=-14000:
+        elif self.cuadrante==4 and posicion_x>=15000 and posicion_y<=-15000:
             self.in_cuadrante=True
     
     def calculate_direction(self, inclinacion_x, inclinacion_y, posicion_x , posicion_y):
         self.is_incuadrante(posicion_x, posicion_y)
+        self.linea_de_fuego(posicion_x,posicion_y)
+        if self.peligro:
+            return self.get_to_center()
         if self.in_cuadrante:
             return self.inclinacion(inclinacion_x, inclinacion_y)
         else:
@@ -75,6 +79,7 @@ class Escalador :
     def __lt__(self,other):
         if self.maximo < other.maximo:
             return self.get_to_center()
+    
     def get_to_center(self):
         if self.cuadrante==1:
             return 5*pi/4
@@ -84,13 +89,17 @@ class Escalador :
           return  pi/4
         if self.cuadrante==4:
             return 3*pi/4
+    
     def go_cuadrante (self):
+        if self.cuadrante==1:
+            return pi/4
         if self.cuadrante==2:
             return pi
         if self.cuadrante==3:
             return 5*pi/4
         if self.cuadrante==4:
             return 6*pi/4
+    
     def seguir_A(self,posicion_x_A, posicion_x_B, posicion_y_A, posicion_y_B):
         if posicion_y_B < posicion_y_A:
             if posicion_x_B > posicion_x_A:
@@ -102,6 +111,7 @@ class Escalador :
                 return pi + math.atan((posicion_y_B-posicion_y_A)/(posicion_x_B-posicion_x_A))
             else:
                return 2*pi + math.atan((posicion_y_B-posicion_y_A)/(posicion_x_B-posicion_x_A))
+    
     def calcular_angulo(self,posicion_x_A, posicion_x_B, posicion_y_A, posicion_y_B):
         dx = posicion_x_A - posicion_x_B
         dy = posicion_y_A - posicion_y_B
@@ -110,9 +120,12 @@ class Escalador :
         if angulo_ajustado < 0:
             angulo_ajustado += 2*math.pi
         return angulo_ajustado
+    
     def linea_de_fuego(self, posicon_x, posicion_y):
-        if posicon_x or posicion_y >= 22800:
-            pass
+        if math.sqrt(posicon_x*posicon_x + posicion_y*posicion_y) >= 22700:
+            self.peligro=True
+        else:
+            self.peligro= False
     
 def find_entry_with_cima(data):
     for territory, territory_values in data.items():
@@ -135,9 +148,9 @@ while not c.is_over():
     lista_escaladores = [E1, E2, E3, E4]
     direccion = {}
     data = c.get_data()
-    #print(data)
+    print(data)
     cima=find_entry_with_cima(data)
-    time.sleep(0.5)
+    #time.sleep(0.5)
     if cima== False:
             for escalador in lista_escaladores:
                  direccion[escalador.nombre] = {'direction': escalador.calculate_direction(data['T1'][escalador.nombre]['inclinacion_x'],
