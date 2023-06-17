@@ -3,39 +3,48 @@ import matplotlib.pyplot as plt
 from mpl_toolkits.mplot3d import Axes3D
 from matplotlib.animation import FuncAnimation
 from communication.client.client import MountainClient
-
+c=MountainClient()
 class RandomPointsAnimation:
-    def __init__(self, radius=23000, num_points_per_frame=4, interval=200):
+    def __init__(self, radius=23, num_points_per_frame=4, interval=200):
         self.radius = radius
         self.num_points_per_frame = num_points_per_frame
         self.interval = interval
         self.fig = plt.figure()
         self.ax = self.fig.add_subplot(111, projection='3d')
+        self.points_x = []
+        self.points_y = []
+        self.points_z = []
         self.circle = None
         self.animation = None
         self.stopped = False
 
     def add_points(self, frame):
-        artists = []  # List to store the artists
-
         # Generate random points
-        for equipo in self.data:
-            for escalador in self.data[equipo]:
-                x = self.data[equipo][escalador]['x']
-                y = self.data[equipo][escalador]['y']
-                z = self.data[equipo][escalador]['z']
-                points = self.ax.scatter(x, y, z, c='r', marker='o', label='Random Points')
-                artists.append(points)
+        data = c.get_data()
+        print(data)
+        
+        new_points_x = []
+        new_points_y = []
+        new_points_z = []
+
+        for equipo  in data:
+            for escalador in data[equipo]:
+                new_points_x.append(data[equipo][escalador]['x'])
+                new_points_y.append(data[equipo][escalador]['y'])
+                new_points_z.append(data[equipo][escalador]['z'])
+        # Add the new points to the existing arrays
+        self.points_x.extend(new_points_x)
+        self.points_y.extend(new_points_y)
+        self.points_z.extend(new_points_z)
+        print(new_points_x)
+        # Plot all points
+        self.ax.scatter(self.points_x, self.points_y, self.points_z, c='r', marker='o', label='Random Points')
 
         # Check if stopping condition is met
         if self.stopped:
             self.animation.event_source.stop()
 
-        return artists  # Return the artists
-
-    def animate(self, data):
-        self.data = data
-
+    def animate(self):
         # Define the circle parameters
         theta = np.linspace(0, 2 * np.pi, 100)  # Angle values from 0 to 2*pi
 
@@ -43,11 +52,8 @@ class RandomPointsAnimation:
         x = self.radius * np.cos(theta)
         y = self.radius * np.sin(theta)
 
-        # Clear previous plot
-        self.ax.cla()
-
         # Plot the circle base
-        self.ax.plot(x, y, zs=0, zdir='z', label='Circle Base')
+        self.circle = self.ax.plot(x, y, zs=0, zdir='z', label='Circle Base')
 
         # Set labels and legend
         self.ax.set_xlabel('X')
@@ -56,17 +62,19 @@ class RandomPointsAnimation:
         self.ax.legend()
 
         # Create the animation
-        self.animation = FuncAnimation(self.fig, self.add_points, frames=1, blit=False)  # Disable blitting
+        self.animation = FuncAnimation(self.fig, self.add_points, interval=self.interval)
 
-        # Update the plot automatically
-        plt.pause(0.001)
+        # Show the 3D plot
+        plt.show()
 
     def stop_animation(self):
         self.stopped = True
 
-animation = RandomPointsAnimation(radius=23, num_points_per_frame=4)
-c = MountainClient()
 
-while not c.is_over():
-    data = c.get_data()
-    animation.animate(data)
+# Create an instance of the RandomPointsAnimation class and start the animation
+animation = RandomPointsAnimation(radius=23, num_points_per_frame=4, interval=100)
+animation.animate()
+
+# Perform some actions or conditions to determine when to stop the animation
+# For example, you can call the stop_animation method to stop the animation after a certain condition is met
+# animation.stop_animation()
