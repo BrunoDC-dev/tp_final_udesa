@@ -21,7 +21,7 @@ class RandomPointsAnimation:
     def add_points(self, frame):
         # Generate random points
         data = c.get_data()
-        print(data)
+        #print(data)
         
         new_points_x = []
         new_points_y = []
@@ -36,7 +36,7 @@ class RandomPointsAnimation:
         self.points_x.extend(new_points_x)
         self.points_y.extend(new_points_y)
         self.points_z.extend(new_points_z)
-        print(new_points_x)
+        #print(new_points_x)
         # Plot all points
         self.ax.scatter(self.points_x, self.points_y, self.points_z, c='r', marker='o', label='Random Points')
 
