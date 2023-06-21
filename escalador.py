@@ -1,3 +1,4 @@
+import random
 import math
 pi = math.pi
 class Escalador :
@@ -18,7 +19,7 @@ class Escalador :
     def new_maximo_angle(self,inclinacion_x, inclinacion_y, posicion_x, posicion_y):
         if self.interaciones_hasta_buscar_maximo>0:
                 self.interaciones_hasta_buscar_maximo-=1
-                print(self.nombre, "estoy siguiendo a")
+                #print(self.nombre, "estoy siguiendo a")
                 return self.calcular_angulo(posicion_x, posicion_y,self.points_to_go[0][0], self.points_to_go[0][1])
         else:
                 self.searching_new_maximo=False
@@ -26,7 +27,7 @@ class Escalador :
     def peligro_angle(self,inclinacion_x, inclinacion_y, posicion_x, posicion_y):
          if self.iteraciones_hasta_salir_peligro>0:
                 self.iteraciones_hasta_salir_peligro-=1
-                print("iteraciones" ,self.iteraciones_hasta_salir_peligro, "Angulo", self.calcular_angulo(posicion_x, posicion_y,self.points_to_go[0][0], self.points_to_go[0][1]))
+                #print("iteraciones" ,self.iteraciones_hasta_salir_peligro, "Angulo", self.calcular_angulo(posicion_x, posicion_y,self.points_to_go[0][0], self.points_to_go[0][1]))
                 return self.calcular_angulo(posicion_x, posicion_y,self.points_to_go[0][0], self.points_to_go[0][1])
          else:
              self.peligro=False
@@ -36,18 +37,19 @@ class Escalador :
         if len(self.points_to_go) >0:
             print(self.points_to_go)
             self.checkpoint(posicion_x,posicion_y)
-        else:
-            print("Estoy aca")
-            self.points_to_go.append([0,0])
+        if len(self.points_to_go)==0:
+            #print("Estoy aca")
+            new_point_x, new_point_y = self.point_on_circumference(22000)
+            self.points_to_go.append([new_point_x,new_point_y])
         if self.searching_new_maximo:
-            print(self.nombre, "Buscando nuevo maximo")
+            #print(self.nombre, "Buscando nuevo maximo")
             return self.new_maximo_angle(inclinacion_x,inclinacion_y, posicion_x,posicion_y)
         if self.peligro:
-            print(self.nombre, "etoy en peligro")
+            #print(self.nombre, "etoy en peligro")
             return self.peligro_angle(inclinacion_x,inclinacion_y, posicion_x,posicion_y)
         if self.dispersarse>0:
             self.dispersarse -=1
-            print(self.nombre, " Me estoy dispersando")
+           # print(self.nombre, " Me estoy dispersando")
             return self.calcular_angulo(posicion_x, posicion_y,self.points_to_go[0][0], self.points_to_go[0][1])
         else:
             self.set_maximo(posicion_z, inclinacion_x, inclinacion_y)
@@ -66,17 +68,17 @@ class Escalador :
         x_gotten =False
         y_gotten = False
         if self.points_to_go[0][0]>0:
-            if posicion_x > self.points_to_go[0][0]:
+            if posicion_x > self.points_to_go[0][0]-100:
                 x_gotten=True
         else:
-              if posicion_x < self.points_to_go[0][0]:
+              if posicion_x < self.points_to_go[0][0]+100:
                 x_gotten=True
         
         if self.points_to_go[0][1]>0:
-            if  posicion_y > self.points_to_go[0][1]:
+            if  posicion_y > self.points_to_go[0][1]-100:
                 y_gotten=True
         else:
-              if posicion_y < self.points_to_go[0][1]:
+              if posicion_y < self.points_to_go[0][1]+100:
                 y_gotten=True
         if x_gotten and y_gotten :
             print(self.nombre,"Complete un punto")
@@ -130,7 +132,7 @@ class Escalador :
     
     def set_maximo(self,maximo , inclinacion_x , inclinacion_y):
         if  abs(inclinacion_x)<5 and abs(inclinacion_y)<5 :
-            print("Encontre un maximo")
+            #print("Encontre un maximo")
             self.maximo = maximo
             self.in_maximo =True
 
@@ -150,10 +152,16 @@ class Escalador :
    
     def add_point_to_go(self):
         if self.cuadrante==1:
-            self.points_to_go = [[-20000,-5000],[-14000,14000],[-5000,20000],[5000,20000]]
+            self.points_to_go = [[-20000,-9000],[-15500,15500],[-9000,20000],[9000,20000]]
         elif self.cuadrante==2:
-            self.points_to_go = [[-14000,14000],[5000,20000],[14000,-14000],[-14000,14000]]
+            self.points_to_go = [[-15500,15500],[9000,20000],[15500,-15500],[-15500,15500]]
         elif self.cuadrante==3:
-            self.points_to_go = [[-5000,-20000],[14000,-14000],[-20000, -5000],[20000,5000]]
+            self.points_to_go = [[-9000,-20000],[15500,-15500],[-20000, -9000],[20000,9000]]
         elif self.cuadrante==4:
-            self.points_to_go = [[14000,-14000],[20000,5000],[-14000,14000],[14000,-14000]]
+            self.points_to_go = [[15500,-15500],[20000,9000],[-15500,15500],[15500,-15500]]
+    
+    def point_on_circumference(self, radius):
+        angle = 2 * pi * random.random()  # Generate a random angle between 0 and 2*pi
+        x = radius * math.cos(angle)
+        y = radius * math.sin(angle)
+        return x, y

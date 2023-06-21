@@ -32,7 +32,7 @@ while not c.is_over():
     lista_escaladores = [E1, E2, E3, E4]
     direccion = {}
     data = c.get_data()
-    print(data)
+    #print(data)
     cima=find_entry_with_cima(data)
     time.sleep(0)
     if cima== False:
