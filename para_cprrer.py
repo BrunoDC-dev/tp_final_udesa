@@ -268,3 +268,12 @@ class Escalador :
     def linea_de_fuego(self, posicon_x, posicion_y):
         if math.sqrt(posicon_x*posicon_x + posicion_y*posicion_y) >= 22700:
             self.peligro=True
+import math
+import random
+def point_on_circumference(radius):
+    angle = 2 * math.pi * random.random()  # Generate a random angle between 0 and 2*pi
+    x = radius * math.cos(angle)
+    y = radius * math.sin(angle)
+    return x, y
+
+print(point_on_circumference(21000))
