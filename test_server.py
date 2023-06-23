@@ -6,5 +6,5 @@ from communication.server.mountain.ackley_mountain import AckleyMountain
 from communication.server.mountain.easom_mountain import EasomMountain
 from communication.server.mountain.rastrigin_mountain import RastriginMountain
 from communication.server.mountain.sinosidal_mountain import SinosidalMountain 
-s= MountainServer(SinosidalMountain(50,23000),(14000,14000),50)
+s= MountainServer(RastriginMountain(50,23000),(14000,14000),50)
 s.start()

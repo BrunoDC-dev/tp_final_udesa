@@ -118,7 +118,7 @@ class Escalador :
                     if esclador_z > self.maximo:
                    
                         self.searching_new_maximo=True
-                        self.interaciones_hasta_buscar_maximo+=2000
+                        self.interaciones_hasta_buscar_maximo+=1500
                         self.in_maximo=False
                    
                         return self.calcular_angulo(posicion_x, posicion_y,self.points_to_go[0][0], self.points_to_go[0][1])
@@ -273,21 +273,20 @@ class Escalador :
         if math.sqrt(posicion_x*posicion_x + posicion_y*posicion_y) >= 22700:
        
             self.peligro=True
-            self.iteraciones_hasta_salir_peligro+=2000
+            self.iteraciones_hasta_salir_peligro+=500
    
     def agregar_puntos_para_ir(self):
         if self.cuadrante==1:
-            self.points_to_go = [[-20000,-9000],[-15500,15500],[-9000,20000],[9000,20000]]
-       
+            self.points_to_go = [[-6000,21000],[6000,-21000],[-21000,-6000],[21000,-6000],[6000,-21000], [6000,21000],[-21000,-6000]]
         elif self.cuadrante==2:
-            self.points_to_go = [[-15500,15500],[9000,20000],[15500,-15500],[-15500,15500]]
-       
+            self.points_to_go = [[21000,-6000],[-21000,6000],[-6000,-21000],[-6000,21000], [-21000,6000], [21000, 6000], [-6000,-21000]]
+             
         elif self.cuadrante==3:
-            self.points_to_go = [[-9000,-20000],[15500,-15500],[-20000, -9000],[20000,9000]]
-       
+            self.points_to_go = [[-21000,-6000],[-15000,16000],[21000, 6000],[-21000,6000],[6000,21000],[-6000,-21000],[-15000,16000] ]
+             
         elif self.cuadrante==4:
-            self.points_to_go = [[15500,-15500],[20000,9000],[-15500,15500],[15500,-15500]]
-    
+            self.points_to_go = [[-6000, -21000],[16000,-15000],[6000,21000],[6000,-21000],[21000,6000],[-21000,-6000],[16000,-15000]]
+             
     def puntos_en_circunferencia(self, radius: float) -> tuple[float, float]:
         """
         Calcula un punto en la circunferencia de un círculo dado un radio.
