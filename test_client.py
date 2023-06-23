@@ -57,8 +57,9 @@ while not c.is_over():
     lista_escaladores = [E1, E2, E3, E4]
     direccion = {}
     data = c.get_data()
+    print(data)
     cima = encontrar_entrada_con_cima(data)
-    time.sleep(0)
+    time.sleep(0.05)
 
     if cima is False:
         for escalador in lista_escaladores:
