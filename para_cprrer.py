@@ -1,279 +1,183 @@
+import numpy as np
+import matplotlib.pyplot as plt
+from matplotlib.widgets import CheckButtons
+def grafico_interactivo():
+        t = np.arange(0.0, 2.0, 0.01)
+        s0 = np.sin(2*np.pi*t)
+        s1 = np.sin(4*np.pi*t)
+        s2 = np.sin(6*np.pi*t)
 
-import math
-pi = math.pi
+        fig, ax = plt.subplots()
+        l0, = ax.plot(t, s0, visible=False, lw=2, color='black', label='1 Hz')
+        l1, = ax.plot(t, s1, lw=2, color='red', label='2 Hz')
+        l2, = ax.plot(t, s2, lw=2, color='green', label='3 Hz')
+        fig.subplots_adjust(left=0.2)
 
-def inclinacion(inclinacion_x, inclinacion_y):
-    if inclinacion_x>0 and inclinacion_y>0:
-        #Cuadrante 1
-            diferencia= inclinacion_y-inclinacion_x
-            if diferencia >0:
-                direction= math.atan(inclinacion_y/inclinacion_x)
-            else:
-                direction = math.atan(inclinacion_y/inclinacion_x)
-    elif inclinacion_x<0 and inclinacion_y>0:
-        #Cuadrante 2
-            diferencia = inclinacion_y - abs(inclinacion_x)
-            if diferencia>0:
-                direction= pi + math.atan(inclinacion_y/inclinacion_x)
-            else:
-                direction = pi + math.atan(inclinacion_y/inclinacion_x)
-    elif inclinacion_x<0 and inclinacion_y<0:
-        #Cuadrante 3
-            diferencia = abs(inclinacion_y) - abs(inclinacion_x)
-            if diferencia>0:
-                direction= pi + math.atan(inclinacion_y/inclinacion_x)
-            else:
-                direction = pi + math.atan(inclinacion_y/inclinacion_x)   
-    elif inclinacion_x>0 and inclinacion_y<0:
-        #Cuadrante 4
-            diferencia = abs(inclinacion_y) - inclinacion_x
-            if diferencia>0:
-                direction=((3*pi)/2 ) - math.atan(inclinacion_x/inclinacion_y)
-            else:
-                direction = 2*pi + math.atan(inclinacion_y/inclinacion_x)        
-    return direction
+        lines_by_label = {l.get_label(): l for l in [l0, l1, l2]}
+        line_colors = [l.get_color() for l in lines_by_label.values()]
+
+        # Make checkbuttons with all plotted lines with correct visibility
+        rax = fig.add_axes([0.05, 0.4, 0.1, 0.15])
+        check = CheckButtons(
+            ax=rax,
+            labels=lines_by_label.keys(),
+            actives=[l.get_visible() for l in lines_by_label.values()],
+            label_props={'color': line_colors},
+            frame_props={'edgecolor': line_colors},
+            check_props={'facecolor': line_colors},
+        )
 
 
-def seguir_A(posicion_x_A, posicion_x_B, posicion_y_A, posicion_y_B):
-        if posicion_y_B < posicion_y_A:
-            if posicion_x_B > posicion_x_A:
-                return pi + math.atan((posicion_y_B-posicion_y_A)/(posicion_x_B-posicion_x_A))
-            else:
-               return math.atan((posicion_y_B-posicion_y_A)/(posicion_x_B-posicion_x_A))
-        else:
-            if posicion_x_B > posicion_x_A:
-                return pi + math.atan((posicion_y_B-posicion_y_A)/(posicion_x_B-posicion_x_A))
-            else:
-               return 2*pi + math.atan((posicion_y_B-posicion_y_A)/(posicion_x_B-posicion_x_A))
-print(seguir_A(0, 16,15, 0))
+        def callback(label):
+            ln = lines_by_label[label]
+            ln.set_visible(not ln.get_visible())
+            ln.figure.canvas.draw_idle()
 
-import math
+        check.on_clicked(callback)
 
-import math
+        plt.show()
+        print('nuevo 44')
 
-def calcular_angulo(xa, ya, xb, yb):
-    dx = xa - xb
-    dy = ya - yb
-    angulo_radianes = math.atan2(dy, dx)
-    angulo_ajustado = math.fmod(angulo_radianes, (2*math.pi))
-    if angulo_ajustado < 0:
-        angulo_ajustado += 2*math.pi
-    return angulo_ajustado
-
-# Ejemplo de uso:
-angulo = calcular_angulo( 0,16,15, 0)
-print("El ángulo en radianes desde el punto B hacia el punto A es:", angulo)
+grafico_interactivo()
 
 
-data = {
-    'T1': {
-        'E1': {'x': 1189.9969120812088, 'y': 3440.2314327755917, 'z': 4999.995954488308, 'inclinacion_x': -0.27984398523202003, 'inclinacion_y': -0.19329532557007667, 'cima': False},
-        'E2': {'x': -20059.14149092554, 'y': 11249.620707240134, 'z': 4070.0016963695484, 'inclinacion_x': 130.16908630550813, 'inclinacion_y': 79.71906509130696, 'cima': False},
-        'E3': {'x': -10159.652375101505, 'y': -8769.096365883212, 'z': 3115.975332998156, 'inclinacion_x': 183.34721276354847, 'inclinacion_y': 184.92885448664708, 'cima': False},
-        'E4': {'x': 11195.847543772232, 'y': -20049.66790220844, 'z': 3958.658167610518, 'inclinacion_x': 76.12075459125668, 'inclinacion_y': 134.46078145383177, 'cima': False}
-    }
-}
 
-def find_entry_with_cima(data):
-    for territory, territory_values in data.items():
-        for entry, entry_values in territory_values.items():
-            if entry_values.get('cima', False):
-                return entry
-    return None
 
-entry_with_cima = find_entry_with_cima(data)
-print(entry_with_cima)
-class Escalador :
-    def __init__(self,nombre,cuadrante) -> None:
-        self.nombre = nombre
-        self.cuadrante=cuadrante 
-        self.maximo =0
-        self.in_maximo=False
-        self.in_cuadrante=False
-        self.peligro=False
-        self.searching_new_maximo=False
-    
-    def is_incuadrante(self, posicion_x , posicion_y):
-        if self.cuadrante==1 and posicion_x>=14000 and posicion_y>=14000:
-            self.in_cuadrante=True
-        elif self.cuadrante==2 and posicion_x<=-14000 and posicion_y>=14000:
-            self.in_cuadrante=True
-        elif self.cuadrante==3 and posicion_x<=-14000 and posicion_y<=-14000:
-            self.in_cuadrante=True
-        elif self.cuadrante==4 and posicion_x>=14000 and posicion_y<=-14000:
-            self.in_cuadrante=True
 
-    def new_maximo_angle(self,inclinacion_x, inclinacion_y, posicion_x, posicion_y):
-        if posicion_x>0 and posicion_y>0:
-            if inclinacion_y <-0.2:
-                self.searching_new_maximo=False
-                return self.inclinacion(inclinacion_x,inclinacion_y)
-            else:
-                return self.seguir_A(0,posicion_x,0,posicion_y)
-        elif posicion_x<0 and posicion_y>0:
-            if inclinacion_y <-0.2:
-                self.searching_new_maximo=False
-                return self.inclinacion(inclinacion_x,inclinacion_y)
-            else:
-                return self.seguir_A(0,posicion_x,0,posicion_y)
-        elif posicion_x<0 and posicion_y<0:
-            if inclinacion_y >0.2:
-                self.searching_new_maximo=False
-                return self.inclinacion(inclinacion_x,inclinacion_y)
-            else:
-                return self.seguir_A(0,posicion_x,0,posicion_y)
-        elif posicion_x>0 and posicion_y<0:
-            if inclinacion_y >0.2:
-                self.searching_new_maximo=False
-                return self.inclinacion(inclinacion_x,inclinacion_y)
-            else:
-                return self.seguir_A(0,posicion_x,0,posicion_y)
-    def peligro_angle(self,inclinacion_x, inclinacion_y, posicion_x, posicion_y):
-        if posicion_x>0 and posicion_y>0:
-            if inclinacion_y <-2 and inclinacion_x<-2:
-                self.peligro=False
-                return self.inclinacion(inclinacion_x,inclinacion_y)
-            else:
-                return self.seguir_A(0,posicion_x,0,posicion_y)
-        elif posicion_x<0 and posicion_y>0:
-            if inclinacion_y <-2 and inclinacion_x>2:
-                self.peligro=False
-                return self.inclinacion(inclinacion_x,inclinacion_y)
-            else:
-                return self.seguir_A(0,posicion_x,0,posicion_y)
-        elif posicion_x<0 and posicion_y<0:
-            if inclinacion_y >2 and inclinacion_x>2:
-                self.peligro=False
-                return self.inclinacion(inclinacion_x,inclinacion_y)
-            else:
-                return self.seguir_A(0,posicion_x,0,posicion_y)
-        elif posicion_x>0 and posicion_y<0:
-            if inclinacion_y >2 and inclinacion_x <-2:
-                self.peligro=False
-                return self.inclinacion(inclinacion_x,inclinacion_y)
-            else:
-                return self.seguir_A(0,posicion_x,0,posicion_y)
-    def calculate_direction(self, inclinacion_x, inclinacion_y, posicion_x , posicion_y,posicion_z, others_z):
-        self.is_incuadrante(posicion_x, posicion_y)
-        if self.searching_new_maximo:
-            return self.new_maximo_angle(inclinacion_x,inclinacion_y, posicion_x,posicion_y)
-        if self.peligro:
-            return self.peligro_angle(inclinacion_x,inclinacion_y, posicion_x,posicion_y)
-        if self.in_cuadrante:
-            self.set_maximo(posicion_z, inclinacion_x, inclinacion_y)
-            self.linea_de_fuego(posicion_x,posicion_y)
-            if self.in_maximo:
-                for esclador_z in others_z:
-                    if esclador_z > self.maximo:
-                        self.searching_new_maximo=True
-                        self.in_maximo=False
-                        return self.seguir_A(0,posicion_x,0,posicion_y)
-                    
-            return self.inclinacion(inclinacion_x, inclinacion_y)
-        else:
-            return self.go_cuadrante()
+"""
+
+import numpy as np
+import matplotlib.pyplot as plt
+
+
+t = np.linspace(0, 1)
+y1 = 2 * np.sin(2*np.pi*t)
+y2 = 4 * np.sin(2*np.pi*2*t)
+
+fig, ax = plt.subplots()
+ax.set_title('Click on legend line to toggle line on/off')
+line1, = ax.plot(t, y1, lw=2, label='1 Hz')
+line2, = ax.plot(t, y2, lw=2, label='2 Hz')
+leg = ax.legend(fancybox=True, shadow=True)
+
+lines = [line1, line2]
+lined = {}  # Will map legend lines to original lines.
+for legline, origline in zip(leg.get_lines(), lines):
+    legline.set_picker(True)  # Enable picking on the legend line.
+    lined[legline] = origline
+
+
+def on_pick(event):
+    # On the pick event, find the original line corresponding to the legend
+    # proxy line, and toggle its visibility.
+    legline = event.artist
+    origline = lined[legline]
+    visible = not origline.get_visible()
+    origline.set_visible(visible)
+    # Change the alpha on the line in the legend, so we can see what lines
+    # have been toggled.
+    legline.set_alpha(1.0 if visible else 0.2)
+    fig.canvas.draw()
+
+fig.canvas.mpl_connect('pick_event', on_pick)
+plt.show()
+
+y1 = data['T1']['E1']['z']
+        y2 = data['T1']['E1']['z']
+
+        fig, self.ax5= self.fig.add_subplot(224)
+        self.ax5.set_title('Eliga el escalador al cual le quiera ver la altura')
+        line1, = self.ax5.plot( y1, lw=2, label='1 Hz')
+        line2, = self.ax5.plot( y2, lw=2, label='2 Hz')
+        leg = self.ax5.legend(fancybox=True, shadow=True)
+
+        lines = [line1, line2]
+        lined = {}  # Will map legend lines to original lines.
+        for legline, origline in zip(leg.get_lines(), lines):
+            legline.set_picker(True)  # Enable picking on the legend line.
+            lined[legline] = origline
+
+
+        def on_pick(event):
+            # On the pick event, find the original line corresponding to the legend
+            # proxy line, and toggle its visibility.
+            legline = event.artist
+            origline = lined[legline]
+            visible = not origline.get_visible()
+            origline.set_visible(visible)
+            # Change the alpha on the line in the legend, so we can see what lines
+            # have been toggled.
+            legline.set_alpha(1.0 if visible else 0.2)
+            fig.canvas.draw()
+
+        fig.canvas.mpl_connect('pick_event', on_pick)
+
+
+        self.i += 1
+        esc1 = data['T1']['E1']['z']
+        esc2 = data['T1']['E2']['z']
+
+
+        # Gráfico de líneas
+        self.ax5.plot(esc1, color = 'm', label = "E1")
+        self.ax5.plot(esc2, color = 'y', label = "E2")
+        self.ax5.legend()
         
 
-    def inclinacion(self,inclinacion_x, inclinacion_y):
-        if inclinacion_x>0 and inclinacion_y>0:
-        #Cuadrante 1
-            diferencia= inclinacion_y-inclinacion_x
-            if diferencia >0:
-                porcentaje=  diferencia/inclinacion_x
-                direction= (pi/4)+(pi/4 )* (min(porcentaje,1))
-            else:
-                porcentaje= abs(diferencia)/inclinacion_y
-                direction = pi/4 -(pi/4)*(min(porcentaje,1))
-        elif inclinacion_x<0 and inclinacion_y>0:
-        #Cuadrante 2
-            diferencia = inclinacion_y - abs(inclinacion_x)
-            if diferencia>0:
-                porcentaje= diferencia/abs(inclinacion_x)
-                direction= (3*pi/4)-(pi/4*(min(porcentaje,1)))
-            else:
-                porcentaje= abs(diferencia)/inclinacion_y
-                direction = (3*pi/4)+(pi/4*(min(porcentaje,1)))
-        elif inclinacion_x<0 and inclinacion_y<0:
-        #Cuadrante 3
-            diferencia = abs(inclinacion_y) - abs(inclinacion_x)
-            if diferencia>0:
-                porcentaje= diferencia/abs(inclinacion_x)
-                direction= (5*pi/4)+(pi/4*(min(porcentaje,1)))
-            else:
-                porcentaje= abs(diferencia)/abs(inclinacion_y)
-                direction = (5*pi/4)-(pi/4*(min(porcentaje,1)))   
-        elif inclinacion_x>0 and inclinacion_y<0:
-        #Cuadrante 4
-            diferencia = abs(inclinacion_y) - inclinacion_x
-            if diferencia>0:
-                porcentaje= diferencia/inclinacion_x
-                direction= (7*pi/4)-(pi/4*(min(porcentaje,1)))
-            else:
-                porcentaje= abs(diferencia)/abs(inclinacion_y)
-                direction = (7*pi/4)+(pi/4*(min(porcentaje,1)))          
-        return direction
-    
-    
-    def set_maximo(self,maximo , inclinacion_x , inclinacion_y):
-        if  abs(inclinacion_x)<1 and abs(inclinacion_y)<1 :
-            self.maximo = maximo
-            self.in_maximo =True
 
 
-    def __lt__(self,other):
-        if self.maximo < other.maximo:
-            return self.get_to_center()
-    
-    def get_to_center(self):
-        if self.cuadrante==1:
-            return 5*pi/4
-        if self.cuadrante==2:
-            return 7*pi/4
-        if self.cuadrante==3:
-          return  pi/4
-        if self.cuadrante==4:
-            return 3*pi/4
-    
-    def go_cuadrante (self):
-        if self.cuadrante==1:
-            return pi/4
-        if self.cuadrante==2:
-            return pi
-        if self.cuadrante==3:
-            return 5*pi/4
-        if self.cuadrante==4:
-            return 6*pi/4
-    
-    def seguir_A(self,posicion_x_A, posicion_x_B, posicion_y_A, posicion_y_B):
-        if posicion_y_B < posicion_y_A:
-            if posicion_x_B > posicion_x_A:
-                return pi + math.atan((posicion_y_B-posicion_y_A)/(posicion_x_B-posicion_x_A))
-            else:
-               return math.atan((posicion_y_B-posicion_y_A)/(posicion_x_B-posicion_x_A))
-        else:
-            if posicion_x_B > posicion_x_A:
-                return pi + math.atan((posicion_y_B-posicion_y_A)/(posicion_x_B-posicion_x_A))
-            else:
-               return 2*pi + math.atan((posicion_y_B-posicion_y_A)/(posicion_x_B-posicion_x_A))
-    
-    def calcular_angulo(self,posicion_x_A, posicion_x_B, posicion_y_A, posicion_y_B):
-        dx = posicion_x_A - posicion_x_B
-        dy = posicion_y_A - posicion_y_B
-        angulo_radianes = math.atan2(dy, dx)
-        angulo_ajustado = math.fmod(angulo_radianes, (2*math.pi))
-        if angulo_ajustado < 0:
-            angulo_ajustado += 2*math.pi
-        return angulo_ajustado
-    
-    def linea_de_fuego(self, posicon_x, posicion_y):
-        if math.sqrt(posicon_x*posicon_x + posicion_y*posicion_y) >= 22700:
-            self.peligro=True
-import math
-import random
-def point_on_circumference(radius):
-    angle = 2 * math.pi * random.random()  # Generate a random angle between 0 and 2*pi
-    x = radius * math.cos(angle)
-    y = radius * math.sin(angle)
-    return x, y
 
-print(point_on_circumference(21000))
+        color_linea = 1
+        for escalador in data['T1']:
+                color_linea += 1
+                if color_linea%2==0: 
+                    col = 'red' 
+                    print('llego aca r')
+                elif color_linea%3==0: 
+                    col = 'green'
+                elif color_linea%4==0: 
+                    col = 'blue'
+                elif color_linea%5==0: 
+                    col = 'magenta'
+                else: col = 'yellow'
+
+                altura = data['T1'][escalador]['z']
+                self.puntosy3.append(altura)
+                self.ax5.plot(self.puntosy3, color = col, label = 'algo')
+
+
+
+                t = np.arange(0.0, 2.0, 0.01)
+            s0 = np.sin(2*np.pi*t)
+            s1 = np.sin(4*np.pi*t)
+            s2 = np.sin(6*np.pi*t)
+
+            ax = self.ax
+            l0, = self.ax.plot(t, s0, visible=False, lw=2, color='black', label='1 Hz')
+            l1, = self.ax.plot(t, s1, lw=2, color='red', label='2 Hz')
+            l2, = self.ax.plot(t, s2, lw=2, color='green', label='3 Hz')
+            self.fig.subplots_adjust(left=0.2)
+
+            lines_by_label = {l.get_label(): l for l in [l0, l1, l2]}
+            line_colors = [l.get_color() for l in lines_by_label.values()]
+
+            # Make checkbuttons with all plotted lines with correct visibility
+            rax = self.fig.add_axes([0.05, 0.05, 0.1, 0.1])
+            check = CheckButtons(
+                ax=rax,
+                labels=lines_by_label.keys(),
+                actives=[l.get_visible() for l in lines_by_label.values()],
+                label_props={'color': line_colors},
+                frame_props={'edgecolor': line_colors},
+                check_props={'facecolor': line_colors},
+            )
+
+
+            def callback(label):
+                ln = lines_by_label[label]
+                ln.set_visible(not ln.get_visible())
+                ln.figure.canvas.draw_idle()
+                self.fig.canvas.draw_idle()
+
+            check.on_clicked(callback)
+"""
