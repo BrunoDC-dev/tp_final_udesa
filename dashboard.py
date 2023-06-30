@@ -8,6 +8,8 @@ from matplotlib.animation import FuncAnimation
 import mpl_toolkits.mplot3d.axes3d as p3
 from tkinter import Tk
 from tkinter import ttk
+from tkinter import Label
+from PIL import ImageTk, Image
 import tkinter
 from communication.client.client import MountainClient
 import numpy as np
@@ -21,7 +23,16 @@ class Dashboard:
     def __init__(self, client: MountainClient):
         self.root = Tk()
         self.root.title("Dashboard")
-        self.root.configure(bg='grey')
+        self.root.geometry("1920x960")
+
+        # Load and resize the background image
+        background = Image.open("Mountainbg.jpg")
+        background = background.resize((1920, 960), Image.ANTIALIAS)
+        self.bg = ImageTk.PhotoImage(background)
+
+        # Create a label widget and set the image as its background
+        self.bg_label = Label(self.root, image=self.bg)
+        self.bg_label.place(x=0, y=0, relwidth=1, relheight=1)
         self.client = client
         self.data = client.get_data()
         self.time_step = 500 # ms
@@ -97,11 +108,10 @@ class Dashboard:
     def helloCallBack(self,equipo):
         self.filtro= equipo
 
-
     def visualization_example(self, frame):
 	    # Code for visualization plot
         fig=plt.figure()
-        fig = plt.figure(facecolor='grey')
+        fig = plt.figure(facecolor="none")
         ax = fig.add_subplot()
         fig.set_size_inches(6,3)
         ax.set_xlim(-24000,24000)
@@ -119,7 +129,7 @@ class Dashboard:
                     new_points_y.append(self.data[self.filtro][escalador]['y'])
                 marker = self.team_styles[self.filtro]
                 color = self.team_colors[self.filtro]
-                ax.scatter(new_points_x, new_points_y, c=color, marker=marker)
+                ax.scatter(new_points_x, new_points_y, c=color, marker=marker, alpha=0.5)
                 if self.filtro not in team_legend_handles:
                         team_legend_handles.append(Line2D([0], [0], marker=marker, color='w', markerfacecolor=color, markersize=10, label=self.filtro))
             else:
@@ -158,7 +168,7 @@ class Dashboard:
         
 	    # Code for visualization plot
         fig=plt.figure()
-        fig = plt.figure(facecolor='grey')
+        fig = plt.figure(facecolor='none')
         ax = fig.add_subplot()
         fig.set_size_inches(4,4)
 
@@ -206,7 +216,7 @@ class Dashboard:
     def visualization_example3(self, frame):
 	    # Code for visualization plot
         fig=plt.figure()
-        fig = plt.figure(facecolor='grey')
+        fig = plt.figure(facecolor='none')
         ax = fig.add_subplot()
         fig.set_size_inches(4,4)
 
@@ -239,7 +249,7 @@ class Dashboard:
     def visualization_example4(self, frame):
 	    # Code for visualization plot
         fig=plt.figure()
-        fig = plt.figure(facecolor='grey')
+        fig = plt.figure(facecolor='none')
         ax = fig.add_subplot()
         fig.set_size_inches(3,2)
         ganadores=[["Equipo","Escalador"]]
@@ -276,7 +286,7 @@ class Dashboard:
     def visualization_example5(self, frame):
 	    # Code for visualization plot
         fig=plt.figure()
-        fig = plt.figure(facecolor='grey')
+        fig = plt.figure(facecolor='none')
         ax = fig.add_subplot(projection='3d')
         fig.set_size_inches(6,4)
         def animate(i):
