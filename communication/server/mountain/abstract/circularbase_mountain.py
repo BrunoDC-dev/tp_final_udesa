@@ -17,6 +17,7 @@ class CircularBaseMountain(Mountain):
         while self.is_out_of_bounds(*self.rotate_coordinates(flag[0], flag[1], 14000, 14000, self.rotation)):
             self.rotation = random.random() * max_rotation
         flag = self.rotate_coordinates(flag[0], flag[1], 14000, 14000, self.rotation)
+        print(flag)
         super().__init__(function, df, flag, visual_radius)
         
     def _unmap_xy(self, x, y):

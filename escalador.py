@@ -5,15 +5,16 @@ class Escalador :
     def __init__(self,nombre,cuadrante) -> None:
         self.nombre = nombre
         self.cuadrante=cuadrante 
-        self.maximo =0
-        self.in_maximo=False
-        self.in_cuadrante=False
         self.peligro=False
         self.searching_new_maximo=False
         self.points_to_go=[]
-        self.dispersarse=1000
+        self.dispersarse=500
         self.interaciones_hasta_buscar_maximo=0
         self.iteraciones_hasta_salir_peligro=0
+        self.iteracion_cima=20
+        self.ultimos_z=[]
+        self.inclinaxion_x=[]
+        self.inclinaxion_y=[]
         self.agregar_puntos_para_ir()
 
     def nuevo_angulo_maximo(self, inclinacion_x: float, inclinacion_y: float, posicion_x: float, posicion_y: float) -> float:
@@ -29,18 +30,96 @@ class Escalador :
         Returns:
             float: El ángulo en radianes para seguir buscando el nuevo máximo.
         """
-   
+        direccion = self.calcular_angulo(posicion_x, posicion_y,self.points_to_go[0][0], self.points_to_go[0][1])
+        print(self.nombre, "    Direccion de aunguloooooooo" , direccion)
         if self.interaciones_hasta_buscar_maximo>0:
    
                 self.interaciones_hasta_buscar_maximo-=1
                 #print(self.nombre, "estoy siguiendo a")
-                return self.calcular_angulo(posicion_x, posicion_y,self.points_to_go[0][0], self.points_to_go[0][1])
+                return direccion
    
         else:
-   
-                self.searching_new_maximo=False
-                return self.inclinacion(inclinacion_x,inclinacion_y)
-   
+                if pi/4 > direccion >= 0 or 7*pi/4<direccion<=2*pi:
+                    if inclinacion_x > 0 :
+                        self.inclinaxion_x[1:]
+                        self.inclinaxion_y[1:]
+                        self.inclinaxion_x.append(inclinacion_x)
+                        self.inclinaxion_y.append(inclinacion_y)
+                        self.searching_new_maximo=False
+                        return self.inclinacion(inclinacion_x,inclinacion_y)
+                    else: 
+                        return direccion
+                elif 3*pi/4>direccion >pi/4:
+                    if inclinacion_y >0 : 
+                        self.inclinaxion_x[1:]
+                        self.inclinaxion_y[1:]
+                        self.inclinaxion_x.append(inclinacion_x)
+                        self.inclinaxion_y.append(inclinacion_y)
+                        self.searching_new_maximo=False
+                        return self.inclinacion(inclinacion_x,inclinacion_y)
+                    else: 
+                        return direccion  
+                elif 5*pi/4>direccion>3*pi/4:
+                    if inclinacion_x<0:
+                        self.inclinaxion_x[1:]
+                        self.inclinaxion_y[1:]
+                        self.inclinaxion_x.append(inclinacion_x)
+                        self.inclinaxion_y.append(inclinacion_y)
+                        self.searching_new_maximo=False
+                        return self.inclinacion(inclinacion_x,inclinacion_y)
+                    else: 
+                        return direccion
+                elif 5*pi/4<direccion<7*pi/4 :
+                    if inclinacion_y<0:
+                        self.inclinaxion_x[1:]
+                        self.inclinaxion_y[1:]
+                        self.inclinaxion_x.append(inclinacion_x)
+                        self.inclinaxion_y.append(inclinacion_y)
+                        self.searching_new_maximo=False
+                        return self.inclinacion(inclinacion_x,inclinacion_y)
+                    else: 
+                        return direccion
+                elif direccion == pi/4:
+                    if inclinacion_x > 0 and  inclinacion_y>0:
+                        self.inclinaxion_x[1:]
+                        self.inclinaxion_y[1:]
+                        self.inclinaxion_x.append(inclinacion_x)
+                        self.inclinaxion_y.append(inclinacion_y)
+                        self.searching_new_maximo=False
+                        return self.inclinacion(inclinacion_x,inclinacion_y)
+                    else: 
+                        return direccion
+                elif direccion == 3*pi/4:
+                    if inclinacion_x < 0 and  inclinacion_y>0:
+                        self.inclinaxion_x[1:]
+                        self.inclinaxion_y[1:]
+                        self.inclinaxion_x.append(inclinacion_x)
+                        self.inclinaxion_y.append(inclinacion_y)
+                        self.searching_new_maximo=False
+                        return self.inclinacion(inclinacion_x,inclinacion_y)
+                    else: 
+                        return direccion
+                elif direccion == 5*pi/4:
+                    if inclinacion_x < 0 and  inclinacion_y<0:
+                        self.inclinaxion_x[1:]
+                        self.inclinaxion_y[1:]
+                        self.inclinaxion_x.append(inclinacion_x)
+                        self.inclinaxion_y.append(inclinacion_y)
+                        self.searching_new_maximo=False
+                        return self.inclinacion(inclinacion_x,inclinacion_y)
+                    else: 
+                        return direccion
+                elif direccion == 7*pi/4:
+                    if inclinacion_x > 0 and  inclinacion_y<0:
+                        self.inclinaxion_x[1:]
+                        self.inclinaxion_y[1:]
+                        self.inclinaxion_x.append(inclinacion_x)
+                        self.inclinaxion_y.append(inclinacion_y)
+                        self.searching_new_maximo=False
+                        return self.inclinacion(inclinacion_x,inclinacion_y)
+                    else: 
+                        return direccion
+                    
     def angulo_peligro(self, inclinacion_x: float, inclinacion_y: float, posicion_x: float, posicion_y: float) -> float:
         """
         Calcula el ángulo cuando el Escalador está en peligro.
@@ -54,21 +133,74 @@ class Escalador :
         Returns:
             float: El ángulo en radianes para evitar el peligro.
         """
-   
+        direccion= self.calcular_angulo(posicion_x, posicion_y,self.points_to_go[0][0], self.points_to_go[0][1])
         if self.iteraciones_hasta_salir_peligro>0:
    
                 self.iteraciones_hasta_salir_peligro-=1
                 #print("iteraciones" ,self.iteraciones_hasta_salir_peligro, "Angulo", self.calcular_angulo(posicion_x, posicion_y,self.points_to_go[0][0], self.points_to_go[0][1]))
-                return self.calcular_angulo(posicion_x, posicion_y,self.points_to_go[0][0], self.points_to_go[0][1])
+                return direccion
    
         else:
-   
-             self.peligro=False
-             return self.inclinacion(inclinacion_x,inclinacion_y)
+             if pi/4 > direccion >= 0 or 7*pi/4<direccion<=2*pi:
+                    if inclinacion_x > 0 :
+                        print(self.nombre ,"entre acccccccccaaaaaaaaaaaaaaaa")
+                        self.peligro=False
+                        return self.inclinacion(inclinacion_x,inclinacion_y)
+                    else: 
+                        return direccion
+             elif 3*pi/4>direccion >pi/4:
+                    if inclinacion_y >0 : 
+                        print(self.nombre ,"entre acccccccccaaaaaaaaaaaaaaaa")
+                        self.peligro=False
+                        return self.inclinacion(inclinacion_x,inclinacion_y)
+                    else: 
+                        return direccion  
+             elif 5*pi/4>direccion>3*pi/4:
+                    if inclinacion_x<0:
+                        print(self.nombre ,"entre acccccccccaaaaaaaaaaaaaaaa")
+                        self.peligro=False
+                        return self.inclinacion(inclinacion_x,inclinacion_y)
+                    else: 
+                        return direccion
+             elif 5*pi/4<direccion<7*pi/4 :
+                    if inclinacion_y<0:
+                        print(self.nombre ,"entre acccccccccaaaaaaaaaaaaaaaa")
+                        self.peligro=False
+                        return self.inclinacion(inclinacion_x,inclinacion_y)
+                    else: 
+                        return direccion
+             elif direccion == pi/4:
+                    if inclinacion_x > 0 and  inclinacion_y>0:
+                        print(self.nombre ,"entre acccccccccaaaaaaaaaaaaaaaa")
+                        self.peligro=False
+                        return self.inclinacion(inclinacion_x,inclinacion_y)
+                    else: 
+                        return direccion
+             elif direccion == 3*pi/4:
+                    if inclinacion_x < 0 and  inclinacion_y>0:
+                        print(self.nombre ,"entre acccccccccaaaaaaaaaaaaaaaa")
+                        self.peligro=False
+                        return self.inclinacion(inclinacion_x,inclinacion_y)
+                    else: 
+                        return direccion
+             elif direccion == 5*pi/4:
+                    if inclinacion_x < 0 and  inclinacion_y<0:
+                        print(self.nombre ,"entre acccccccccaaaaaaaaaaaaaaaa")
+                        self.peligro=False
+                        return self.inclinacion(inclinacion_x,inclinacion_y)
+                    else: 
+                        return direccion
+             elif direccion == 7*pi/4:
+                    if inclinacion_x > 0 and  inclinacion_y<0:
+                        print(self.nombre ,"entre acccccccccaaaaaaaaaaaaaaaa")
+                        self.peligro=False
+                        return self.inclinacion(inclinacion_x,inclinacion_y)
+                    else: 
+                        return direccion
     
     
     def calcular_direccion(self, inclinacion_x: float, inclinacion_y: float, posicion_x: float, 
-                            posicion_y: float,posicion_z: float, others_z: list[float]) -> float:
+                            posicion_y: float,posicion_z: float, top_z: float) -> float:
         """
         Calcula la dirección en la que debe moverse el Escalador.
 
@@ -84,7 +216,7 @@ class Escalador :
             float: El ángulo en radianes para la dirección en la que debe moverse el Escalador.
         """
         if len(self.points_to_go) >0:
-            print(self.points_to_go)
+            #print(self.points_to_go)
             self.punto_de_control(posicion_x,posicion_y)
         
         if len(self.points_to_go)==0:
@@ -92,13 +224,15 @@ class Escalador :
             new_point_x, new_point_y = self.puntos_en_circunferencia(22000)
             self.points_to_go.append([new_point_x,new_point_y])
         
-        if self.searching_new_maximo:
-            #print(self.nombre, "Buscando nuevo maximo")
-            return self.nuevo_angulo_maximo(inclinacion_x,inclinacion_y, posicion_x,posicion_y)
-        
+        self.linea_de_fuego(posicion_x,posicion_y)
         if self.peligro:
             #print(self.nombre, "etoy en peligro")
             return self.angulo_peligro(inclinacion_x,inclinacion_y, posicion_x,posicion_y)
+        
+        if self.searching_new_maximo:
+            #print(self.nombre, "Buscando nuevo maximo")
+            return self.nuevo_angulo_maximo(inclinacion_x,inclinacion_y, posicion_x,posicion_y)
+    
         
         if self.dispersarse>0:
         
@@ -108,22 +242,8 @@ class Escalador :
         
         else:
            
-            self.set_maximo(posicion_z, inclinacion_x, inclinacion_y)
-            self.linea_de_fuego(posicion_x,posicion_y)
-            
-            if self.in_maximo:
-                
-                for esclador_z in others_z:
-                   
-                    if esclador_z > self.maximo:
-                   
-                        self.searching_new_maximo=True
-                        self.interaciones_hasta_buscar_maximo+=2000
-                        self.in_maximo=False
-                   
-                        return self.calcular_angulo(posicion_x, posicion_y,self.points_to_go[0][0], self.points_to_go[0][1])
-                    
-            return self.inclinacion(inclinacion_x, inclinacion_y)
+            return self.maximo_local(top_z , posicion_x, posicion_y, posicion_z, inclinacion_x, inclinacion_y)
+        
         
     def punto_de_control(self, posicion_x: float, posicion_y: float) -> None:
         """
@@ -223,21 +343,6 @@ class Escalador :
                 direction = (7*pi/4)+(pi/4*(min(porcentaje,1)))          
        
         return direction
-    
-    
-    def set_maximo(self, posicion_z: float, inclinacion_x: float, inclinacion_y: float) -> None:
-        """
-        Establece el valor máximo y verifica si el Escalador está en el máximo.
-
-        Args:
-            posicion_z (float): Posición en el eje z.
-            inclinacion_x (float): Inclinación en el eje x.
-            inclinacion_y (float): Inclinación en el eje y.
-        """
-        if  abs(inclinacion_x)<5 and abs(inclinacion_y)<5 :
-            #print("Encontre un maximo")
-            self.maximo = posicion_z
-            self.in_maximo =True
 
     
     def calcular_angulo(self, posicion_x: float, posicion_y: float, objetivo_x: float, objetivo_y: float) -> float:
@@ -273,21 +378,20 @@ class Escalador :
         if math.sqrt(posicion_x*posicion_x + posicion_y*posicion_y) >= 22700:
        
             self.peligro=True
-            self.iteraciones_hasta_salir_peligro+=2000
+            self.iteraciones_hasta_salir_peligro+=5
    
     def agregar_puntos_para_ir(self):
         if self.cuadrante==1:
-            self.points_to_go = [[-20000,-9000],[-15500,15500],[-9000,20000],[9000,20000]]
-       
+            self.points_to_go = [[-6000,21000],[6000,-21000],[-21000,-6000],[21000,-6000],[6000,-21000], [6000,21000],[-21000,-6000]]
         elif self.cuadrante==2:
-            self.points_to_go = [[-15500,15500],[9000,20000],[15500,-15500],[-15500,15500]]
-       
+            self.points_to_go = [[21000,-6000],[-21000,6000],[-6000,-21000],[-6000,21000], [-21000,6000], [21000, 6000], [-6000,-21000]]
+             
         elif self.cuadrante==3:
-            self.points_to_go = [[-9000,-20000],[15500,-15500],[-20000, -9000],[20000,9000]]
-       
+            self.points_to_go = [[-21000,-6000],[-15000,16000],[21000, 6000],[-21000,6000],[6000,21000],[-6000,-21000],[-15000,16000] ]
+             
         elif self.cuadrante==4:
-            self.points_to_go = [[15500,-15500],[20000,9000],[-15500,15500],[15500,-15500]]
-    
+            self.points_to_go = [[-6000, -21000],[16000,-15000],[6000,21000],[6000,-21000],[21000,6000],[-21000,-6000],[16000,-15000]]
+             
     def puntos_en_circunferencia(self, radius: float) -> tuple[float, float]:
         """
         Calcula un punto en la circunferencia de un círculo dado un radio.
@@ -304,3 +408,32 @@ class Escalador :
         y = radius * math.sin(angle)
       
         return x, y
+    
+    def maximo_local (self,top_z , posicion_x, posicion_y , posicion_z , inclinacion_x , inclinacion_y ):
+        print(self.ultimos_z)
+        if  len( self.inclinaxion_x)==0 and len(self.inclinaxion_y)==0:
+            self.inclinaxion_x.append(inclinacion_x)
+            self.inclinaxion_y.append(inclinacion_y)
+            return self.inclinacion(inclinacion_x,inclinacion_y)
+        cambio_x=False
+        cambio_y=False
+        if self.inclinaxion_x[0] > 0:  
+            if inclinacion_x<0:
+                cambio_x = True
+        elif self.inclinaxion_x[0]<0:
+            if inclinacion_x >0 :
+                cambio_x=True
+        if self.inclinaxion_y[0] >0 : 
+            if inclinacion_y<0:
+                cambio_y=True
+        elif self.inclinaxion_y[0]<0:
+            if inclinacion_y >0:
+                cambio_y=True
+        
+        if cambio_x and cambio_y:
+            self.searching_new_maximo=True
+            return self.nuevo_angulo_maximo(inclinacion_x,inclinacion_y, posicion_x, posicion_y)
+        else:
+            return self.inclinacion(inclinacion_x,inclinacion_y)
+    
+
