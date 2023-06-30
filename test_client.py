@@ -153,7 +153,7 @@ while not c.is_over():
                     data['T1'][escalador.nombre]['x'],
                     data['T1'][escalador.nombre]['y'],
                     data['T1'][escalador.nombre]['z'],
-                    top_z),
+                    ),
                 'speed': velocidad}
     else:
         for escalador in lista_escaladores:
@@ -165,8 +165,7 @@ while not c.is_over():
                         data['T1'][escalador.nombre]['inclinacion_y'],
                         data['T1'][escalador.nombre]['x'],
                         data['T1'][escalador.nombre]['y'],
-                        data['T1'][escalador.nombre]['z'],
-                        top_z),
+                        data['T1'][escalador.nombre]['z']),
                     'speed': velocidad}
             else:
                 direccion[escalador.nombre] = {

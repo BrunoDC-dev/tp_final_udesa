@@ -56,30 +56,6 @@ def encontrar_entrada_con_cima(data: dict) -> tuple:
                 return (territorio, entrada)
     return (None, None)
 
-def top_z_checker (data:dict , top_Z:list)->float:
-    """
-    Chequea todos los z de los equipos y devuelve el mas grande a lo largo del tiempo
-
-    Args:
-        data (dict): Datos que contienen territorios y entradas.
-        top_Z (float): z mas grande.
-
-    Returns:
-        El z mas grande de esa iteracion.
-    """
-    respuesta_escalador= top_Z[0]
-    respuesta_z = top_Z[1]
-
-    for equipo in data:
-        for escalador in data[equipo]:
-            posible_z = data[equipo][escalador]['z']
-            if posible_z>respuesta_z:
-                respuesta_escalador=escalador
-                respuesta_z =  posible_z
-    return respuesta_escalador, respuesta_z
-
-# ...
-
 while True:
     try:
         c = MountainClient(ip,int(port))
@@ -135,16 +111,14 @@ E3 = Escalador("E3", 3)
 E4 = Escalador("E4", 4)
 
 c.finish_registration()
-top_z =["",0]
 while not c.is_over():
     velocidad = 50
     lista_escaladores = [E1, E2, E3, E4]
     direccion = {}
     data = c.get_data()
-    #print(data)
+    print(data)
     #time.sleep(0.3)
     team, hiker = encontrar_entrada_con_cima(data)
-    top_z[0] , top_z[1] = top_z_checker(data,top_z)
     if hiker is None:
         for escalador in lista_escaladores:
             if escalador.nombre in data['B2']:
@@ -155,7 +129,7 @@ while not c.is_over():
                     data['B2'][escalador.nombre]['x'],
                     data['B2'][escalador.nombre]['y'],
                     data['B2'][escalador.nombre]['z'],
-                    top_z),
+                    ),
                 'speed': velocidad}
     else:
         for escalador in lista_escaladores:
@@ -168,7 +142,7 @@ while not c.is_over():
                         data['B2'][escalador.nombre]['x'],
                         data['B2'][escalador.nombre]['y'],
                         data['B2'][escalador.nombre]['z'],
-                        top_z),
+                        ),
                     'speed': velocidad}
             else:
                 direccion[escalador.nombre] = {
