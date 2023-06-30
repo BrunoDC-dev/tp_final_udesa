@@ -55,6 +55,7 @@ def encontrar_entrada_con_cima(data: dict) -> tuple:
             if valores_entrada.get('cima', False):
                 return (territorio, entrada)
     return (None, None)
+
 def top_z_checker (data:dict , top_Z:list)->float:
     """
     Chequea todos los z de los equipos y devuelve el mas grande a lo largo del tiempo
@@ -85,7 +86,7 @@ while True:
         # Resto del código que depende de la conexión con el servidor
 
         # Agregar equipos y escaladores
-        c.add_team('T1', ['E1', 'E2', 'E3', 'E4'])
+        c.add_team('B2', ['E1', 'E2', 'E3', 'E4'])
         # Resto del código
 
         break  # Si la conexión es exitosa, salimos del bucle
@@ -127,12 +128,13 @@ while True:
 
 # Agregar equipos y escaladores
 
-c.add_team('T1', ['E1', 'E2', 'E3', 'E4'])
+c.add_team('B2', ['E1', 'E2', 'E3', 'E4'])
 E1 = Escalador("E1", 1)
 E2 = Escalador("E2", 2)
 E3 = Escalador("E3", 3)
 E4 = Escalador("E4", 4)
 
+c.finish_registration()
 top_z =["",0]
 while not c.is_over():
     velocidad = 50
@@ -145,37 +147,37 @@ while not c.is_over():
     top_z[0] , top_z[1] = top_z_checker(data,top_z)
     if hiker is None:
         for escalador in lista_escaladores:
-            if escalador.nombre in data['T1']:
+            if escalador.nombre in data['B2']:
                 direccion[escalador.nombre] = {
                     'direction': escalador.calcular_direccion(
-                    data['T1'][escalador.nombre]['inclinacion_x'],
-                    data['T1'][escalador.nombre]['inclinacion_y'],
-                    data['T1'][escalador.nombre]['x'],
-                    data['T1'][escalador.nombre]['y'],
-                    data['T1'][escalador.nombre]['z'],
+                    data['B2'][escalador.nombre]['inclinacion_x'],
+                    data['B2'][escalador.nombre]['inclinacion_y'],
+                    data['B2'][escalador.nombre]['x'],
+                    data['B2'][escalador.nombre]['y'],
+                    data['B2'][escalador.nombre]['z'],
                     top_z),
                 'speed': velocidad}
     else:
         for escalador in lista_escaladores:
-         if escalador.nombre in data['T1']:
+         if escalador.nombre in data['B2']:
             if escalador.nombre == hiker and  team == 'T1':
                 direccion[escalador.nombre] = {
                     'direction': escalador.calcular_direccion(
-                        data['T1'][escalador.nombre]['inclinacion_x'],
-                        data['T1'][escalador.nombre]['inclinacion_y'],
-                        data['T1'][escalador.nombre]['x'],
-                        data['T1'][escalador.nombre]['y'],
-                        data['T1'][escalador.nombre]['z'],
+                        data['B2'][escalador.nombre]['inclinacion_x'],
+                        data['B2'][escalador.nombre]['inclinacion_y'],
+                        data['B2'][escalador.nombre]['x'],
+                        data['B2'][escalador.nombre]['y'],
+                        data['B2'][escalador.nombre]['z'],
                         top_z),
                     'speed': velocidad}
             else:
                 direccion[escalador.nombre] = {
                     'direction': escalador.calcular_angulo(
-                        data['T1'][escalador.nombre]['x'],
-                        data['T1'][escalador.nombre]['y'],
+                        data['B2'][escalador.nombre]['x'],
+                        data['B2'][escalador.nombre]['y'],
                         data[team][hiker]['x'],
                         data[team][hiker]['y']
                     ),
                     'speed': velocidad}
 
-    c.next_iteration('T1', direccion)
+    c.next_iteration('B2', direccion)
