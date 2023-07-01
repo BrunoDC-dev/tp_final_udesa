@@ -1,5 +1,5 @@
 from communication.client.client import MountainClient
-from escalador import Escalador
+from tpf_mica_escalador import Escalador
 import math
 import time
 import socket
@@ -22,20 +22,20 @@ ip = args.ip
 # Imprimir el valor del argumento "--ip"
 while True:
     if ip is None:
-        print("No IP address and port provided. Defaulting to localhost:8080")
+        print("No direccion IP  ni puerto dados. Default localhost:8080")
         ip = "localhost:8080"
         ip, port = ip.split(":")
     else:
-        print("The provided IP address and port are:", ip)
+        print("La Ip y el Puerto dado son:", ip)
         ip_parts = ip.split(":")
         if len(ip_parts) != 2:
-            print("Invalid IP address and port format. Please provide in the format 'address:port'")
-            ip = input("Enter the IP address and port: ")
+            print("Formato invalido. Por favor envielo 'ip:puerto'")
+            ip = input("Escriba Ip:puerto: ")
             continue
         ip, port = ip_parts
         if not port.isdigit():
-            print("Invalid port number. Please provide a valid port number.")
-            ip = input("Enter the IP address and port: ")
+            print("Invalido numero de puerto. Por favor de un puerto valido")
+            ip = input("Escriba Ip:puerto: ")
             continue
         port = int(port)
     break
@@ -55,42 +55,16 @@ def encontrar_entrada_con_cima(data: dict) -> tuple:
             if valores_entrada.get('cima', False):
                 return (territorio, entrada)
     return (None, None)
-def top_z_checker (data:dict , top_Z:list)->float:
-    """
-    Chequea todos los z de los equipos y devuelve el mas grande a lo largo del tiempo
-
-    Args:
-        data (dict): Datos que contienen territorios y entradas.
-        top_Z (float): z mas grande.
-
-    Returns:
-        El z mas grande de esa iteracion.
-    """
-    respuesta_escalador= top_Z[0]
-    respuesta_z = top_Z[1]
-
-    for equipo in data:
-        for escalador in data[equipo]:
-            posible_z = data[equipo][escalador]['z']
-            if posible_z>respuesta_z:
-                respuesta_escalador=escalador
-                respuesta_z =  posible_z
-    return respuesta_escalador, respuesta_z
-
-# ...
 
 while True:
     try:
         c = MountainClient(ip,int(port))
-        # Resto del código que depende de la conexión con el servidor
 
-        # Agregar equipos y escaladores
-        c.add_team('T1', ['E1', 'E2', 'E3', 'E4'])
-        # Resto del código
+        c.add_team('B2', ['E1', 'E2', 'E3', 'E4'])
 
         break  # Si la conexión es exitosa, salimos del bucle
 
-    except (ConnectionRefusedError, socket.gaierror):
+    except (ConnectionRefusedError, socket.gaierror,OSError):
         print("No se pudo establecer una conexión con el servidor. Asegúrate de que el servidor esté en funcionamiento y el puerto sea correcto.")
         print("IP y puerto proporcionados: ", ip, ":", port)
 
@@ -127,55 +101,51 @@ while True:
 
 # Agregar equipos y escaladores
 
-c.add_team('T1', ['E1', 'E2', 'E3', 'E4'])
+c.add_team('B2', ['E1', 'E2', 'E3', 'E4'])
 E1 = Escalador("E1", 1)
 E2 = Escalador("E2", 2)
 E3 = Escalador("E3", 3)
 E4 = Escalador("E4", 4)
 
-top_z =["",0]
+c.finish_registration()
 while not c.is_over():
     velocidad = 50
     lista_escaladores = [E1, E2, E3, E4]
     direccion = {}
     data = c.get_data()
-    #print(data)
-    #time.sleep(0.3)
+    print(data)
     team, hiker = encontrar_entrada_con_cima(data)
-    top_z[0] , top_z[1] = top_z_checker(data,top_z)
     if hiker is None:
         for escalador in lista_escaladores:
-            if escalador.nombre in data['T1']:
+            if escalador.nombre in data['B2']:
                 direccion[escalador.nombre] = {
                     'direction': escalador.calcular_direccion(
-                    data['T1'][escalador.nombre]['inclinacion_x'],
-                    data['T1'][escalador.nombre]['inclinacion_y'],
-                    data['T1'][escalador.nombre]['x'],
-                    data['T1'][escalador.nombre]['y'],
-                    data['T1'][escalador.nombre]['z'],
-                    top_z),
+                    data['B2'][escalador.nombre]['inclinacion_x'],
+                    data['B2'][escalador.nombre]['inclinacion_y'],
+                    data['B2'][escalador.nombre]['x'],
+                    data['B2'][escalador.nombre]['y'],
+                    ),
                 'speed': velocidad}
     else:
         for escalador in lista_escaladores:
-         if escalador.nombre in data['T1']:
+         if escalador.nombre in data['B2']:
             if escalador.nombre == hiker and  team == 'T1':
                 direccion[escalador.nombre] = {
                     'direction': escalador.calcular_direccion(
-                        data['T1'][escalador.nombre]['inclinacion_x'],
-                        data['T1'][escalador.nombre]['inclinacion_y'],
-                        data['T1'][escalador.nombre]['x'],
-                        data['T1'][escalador.nombre]['y'],
-                        data['T1'][escalador.nombre]['z'],
-                        top_z),
+                        data['B2'][escalador.nombre]['inclinacion_x'],
+                        data['B2'][escalador.nombre]['inclinacion_y'],
+                        data['B2'][escalador.nombre]['x'],
+                        data['B2'][escalador.nombre]['y'],
+                        ),
                     'speed': velocidad}
             else:
                 direccion[escalador.nombre] = {
                     'direction': escalador.calcular_angulo(
-                        data['T1'][escalador.nombre]['x'],
-                        data['T1'][escalador.nombre]['y'],
+                        data['B2'][escalador.nombre]['x'],
+                        data['B2'][escalador.nombre]['y'],
                         data[team][hiker]['x'],
                         data[team][hiker]['y']
                     ),
                     'speed': velocidad}
 
-    c.next_iteration('T1', direccion)
+    c.next_iteration('B2', direccion)

@@ -9,13 +9,10 @@ from communication.server.mountain.sinosidal_mountain import SinosidalMountain
 import argparse
 import socket
 
-# Crear el parser de argumentos
 parser = argparse.ArgumentParser()
 
-# Agregar un argumento "--ip" al parser
 parser.add_argument("--ip", help="Dirección IP y puerto")
 
-# Obtener los argumentos de la línea de comandos
 args = parser.parse_args()
 
 # Acceder al valor del argumento "--ip"
@@ -24,20 +21,20 @@ ip = args.ip
 # Imprimir el valor del argumento "--ip"
 while True:
     if ip is None:
-        print("No IP address and port provided. Defaulting to localhost:8080")
+        print("No direccion IP  ni dados. Default localhost:8080")
         ip = "localhost:8080"
         ip, port = ip.split(":")
     else:
-        print("The provided IP address and port are:", ip)
+        print("La Ip y el Puerto dado son:", ip)
         ip_parts = ip.split(":")
         if len(ip_parts) != 2:
-            print("Invalid IP address and port format. Please provide in the format 'address:port'")
-            ip = input("Enter the IP address and port: ")
+            print("Formato invalido. Por favor envielo 'ip:puerto'")
+            ip = input("Escriba Ip:puerto: ")
             continue
         ip, port = ip_parts
         if not port.isdigit():
-            print("Invalid port number. Please provide a valid port number.")
-            ip = input("Enter the IP address and port: ")
+            print("Invalido numero de puerto. Por favor de un puerto valido")
+            ip = input("Escriba Ip:puerto: ")
             continue
         port = int(port)
     break
@@ -81,7 +78,7 @@ while True:
     try:
         s.start()
         break  # Si el servidor se inicia correctamente, salimos del bucle
-    except (ConnectionRefusedError, socket.gaierror) as e:
+    except (ConnectionRefusedError, socket.gaierror, OSError) as e:
         print("Failed to start the server:", str(e))
         print("IP y puerto proporcionados:", ip, ":", port)
 
@@ -106,12 +103,12 @@ while True:
                         print("El puerto debe ser un número entero.")
                         continue
 
-                    break  # Salir del bucle interno y continuar con el siguiente paso
+                    break  
 
-                break  # Salir del bucle interno y continuar con el siguiente paso
+                break  
             elif opcion == "3":
                 print("Saliendo del programa.")
-                exit()  # Salir del programa
+                exit()  
             else:
                 print("Opción inválida. Por favor, elige una opción válida.")
     
