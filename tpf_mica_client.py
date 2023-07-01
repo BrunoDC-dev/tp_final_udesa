@@ -1,5 +1,5 @@
 from communication.client.client import MountainClient
-from escalador import Escalador
+from tpf_mica_escalador import Escalador
 import math
 import time
 import socket
@@ -22,20 +22,20 @@ ip = args.ip
 # Imprimir el valor del argumento "--ip"
 while True:
     if ip is None:
-        print("No IP address and port provided. Defaulting to localhost:8080")
+        print("No direccion IP  ni puerto dados. Default localhost:8080")
         ip = "localhost:8080"
         ip, port = ip.split(":")
     else:
-        print("The provided IP address and port are:", ip)
+        print("La Ip y el Puerto dado son:", ip)
         ip_parts = ip.split(":")
         if len(ip_parts) != 2:
-            print("Invalid IP address and port format. Please provide in the format 'address:port'")
-            ip = input("Enter the IP address and port: ")
+            print("Formato invalido. Por favor envielo 'ip:puerto'")
+            ip = input("Escriba Ip:puerto: ")
             continue
         ip, port = ip_parts
         if not port.isdigit():
-            print("Invalid port number. Please provide a valid port number.")
-            ip = input("Enter the IP address and port: ")
+            print("Invalido numero de puerto. Por favor de un puerto valido")
+            ip = input("Escriba Ip:puerto: ")
             continue
         port = int(port)
     break
@@ -82,15 +82,13 @@ def top_z_checker (data:dict , top_Z:list)->float:
 while True:
     try:
         c = MountainClient(ip,int(port))
-        # Resto del código que depende de la conexión con el servidor
 
         # Agregar equipos y escaladores
-        c.add_team('T1', ['E1', 'E2', 'E3', 'E4'])
-        # Resto del código
+        c.add_team('MICA', ['ISA', 'BRUNO', 'ESTANISLAO', 'CAMILA'])
 
         break  # Si la conexión es exitosa, salimos del bucle
 
-    except (ConnectionRefusedError, socket.gaierror):
+    except (ConnectionRefusedError, socket.gaierror,OSError):
         print("No se pudo establecer una conexión con el servidor. Asegúrate de que el servidor esté en funcionamiento y el puerto sea correcto.")
         print("IP y puerto proporcionados: ", ip, ":", port)
 
@@ -127,16 +125,16 @@ while True:
 
 # Agregar equipos y escaladores
 
-c.add_team('T1', ['E1', 'E2', 'E3', 'E4'])
-E1 = Escalador("E1", 1)
-E2 = Escalador("E2", 2)
-E3 = Escalador("E3", 3)
-E4 = Escalador("E4", 4)
+c.add_team('MICA', ['ISA', 'BRUNO', 'ESTANISLAO', 'CAMILA'])
+ISA = Escalador("ISA", 1)
+BRUNO = Escalador("BRUNO", 2)
+ESTANISLAO = Escalador("ESTANISLAO", 3)
+CAMILA = Escalador("CAMILA", 4)
 
 top_z =["",0]
 while not c.is_over():
     velocidad = 50
-    lista_escaladores = [E1, E2, E3, E4]
+    lista_escaladores = [ISA, BRUNO, ESTANISLAO, CAMILA]
     direccion = {}
     data = c.get_data()
     #print(data)
@@ -145,36 +143,34 @@ while not c.is_over():
     top_z[0] , top_z[1] = top_z_checker(data,top_z)
     if hiker is None:
         for escalador in lista_escaladores:
-            if escalador.nombre in data['T1']:
+            if escalador.nombre in data['MICA']:
                 direccion[escalador.nombre] = {
                     'direction': escalador.calcular_direccion(
-                    data['T1'][escalador.nombre]['inclinacion_x'],
-                    data['T1'][escalador.nombre]['inclinacion_y'],
-                    data['T1'][escalador.nombre]['x'],
-                    data['T1'][escalador.nombre]['y'],
-                    data['T1'][escalador.nombre]['z'],
+                    data['MICA'][escalador.nombre]['inclinacion_x'],
+                    data['MICA'][escalador.nombre]['inclinacion_y'],
+                    data['MICA'][escalador.nombre]['x'],
+                    data['MICA'][escalador.nombre]['y']
                     ),
                 'speed': velocidad}
     else:
         for escalador in lista_escaladores:
-         if escalador.nombre in data['T1']:
-            if escalador.nombre == hiker and  team == 'T1':
+         if escalador.nombre in data['MICA']:
+            if escalador.nombre == hiker and  team == 'MICA':
                 direccion[escalador.nombre] = {
                     'direction': escalador.calcular_direccion(
-                        data['T1'][escalador.nombre]['inclinacion_x'],
-                        data['T1'][escalador.nombre]['inclinacion_y'],
-                        data['T1'][escalador.nombre]['x'],
-                        data['T1'][escalador.nombre]['y'],
-                        data['T1'][escalador.nombre]['z']),
+                        data['MICA'][escalador.nombre]['inclinacion_x'],
+                        data['MICA'][escalador.nombre]['inclinacion_y'],
+                        data['MICA'][escalador.nombre]['x'],
+                        data['MICA'][escalador.nombre]['y']),
                     'speed': velocidad}
             else:
                 direccion[escalador.nombre] = {
                     'direction': escalador.calcular_angulo(
-                        data['T1'][escalador.nombre]['x'],
-                        data['T1'][escalador.nombre]['y'],
+                        data['MICA'][escalador.nombre]['x'],
+                        data['MICA'][escalador.nombre]['y'],
                         data[team][hiker]['x'],
                         data[team][hiker]['y']
                     ),
                     'speed': velocidad}
 
-    c.next_iteration('T1', direccion)
+    c.next_iteration('MICA', direccion)

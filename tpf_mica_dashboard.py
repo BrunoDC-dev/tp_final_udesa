@@ -10,6 +10,8 @@ from tkinter import Tk
 from tkinter import ttk
 from tkinter import Label
 from PIL import ImageTk, Image
+from tkinter import Label
+from PIL import ImageTk, Image
 import tkinter
 from communication.client.client import MountainClient
 import numpy as np
@@ -18,9 +20,15 @@ from matplotlib.backends.backend_tkagg import (
 from matplotlib.backend_bases import key_press_handler
 import random
 from matplotlib.lines import Line2D
-
+import argparse
 class Dashboard:
     def __init__(self, client: MountainClient):
+        """
+        Initialize the Dashboard object.
+
+        Args:
+            client (MountainClient): The client object for data communication.
+        """
         self.root = Tk()
         self.root.title("Dashboard")
         self.root.geometry("1920x960")
@@ -39,6 +47,7 @@ class Dashboard:
         self.animations = [] # for animations to stay alive in memory
         self.figsize = (4.5, 3)
         self.filtro=None
+        #Si hay un solo equipo nos centramos en ese y modificamos el filtro 
         if len(self.data) ==1:
             for equipo in self.data:
                 self.filtro = equipo
@@ -48,13 +57,14 @@ class Dashboard:
         self.team_colors = {} 
         self.team_styles = {} 
         i = -1
+        #Se el agregan de forma aleatoria distinos colore para los equipos y marcadores de puntos
         for equipo in self.data:
                 if equipo not in self.team_styles:
-                    marker = random.choice(['o', 's', '^', 'v', '*', 'x'])  # List of marker styles to choose from
+                    marker = random.choice(['o', 's', '^', 'v', '*', 'x'])  
                     self.team_styles[equipo] = marker
                 marker = self.team_styles[equipo]
                 if equipo not in self.team_styles:
-                    marker = random.choice(['o', 's', '^', 'v', '*', 'x'])  # List of marker styles to choose from
+                    marker = random.choice(['o', 's', '^', 'v', '*', 'x'])  
                     self.team_styles[equipo] = marker
                 if equipo not in self.team_colors:
                     colores_m = ['#1f2138','#fdd3e7','#a086ab','#c1d9f5']
@@ -63,26 +73,26 @@ class Dashboard:
                         i = 0
                     self.team_colors[equipo] = colores_m[i]
                 
-        
+        #Se crean cada uno  de los frames 
         self.frame1=ttk.Frame(self.root)
         self.frame1.place(x=100,y=10)
-        self.visualization_example(self.frame1)
+        self.team_map(self.frame1)
         
         self.frame2=ttk.Frame(self.root)
         self.frame2.place(x=100,y=330)
-        self.visualization_example2(self.frame2)
+        self.altruas_prom(self.frame2)
         
         self.frame3=ttk.Frame(self.root)
         self.frame3.place(x=1000,y=330)
-        self.visualization_example3(self.frame3)
+        self.altura_max(self.frame3)
         
         self.frame4=ttk.Frame(self.root)
         self.frame4.place(x=800,y=10)
-        self.visualization_example4(self.frame4)
+        self.leaderboard(self.frame4)
 
         self.frame5=ttk.Frame(self.root)
         self.frame5.place(x=500,y=330)
-        self.visualization_example5(self.frame5)
+        self.porjection3D(self.frame5)
         
 
         fig =plt.figure()
@@ -97,25 +107,27 @@ class Dashboard:
 
         button = tkinter.Button(master=self.root, text="Quit", command=self.root.quit)
         data=self.data
-        home = tkinter.Button(self.root, text="Inicio", command=lambda equipo=None: self.helloCallBack(None))
+        home = tkinter.Button(self.root, text="Inicio", command=lambda equipo=None: self.filtroCallBack(None))
         home.pack(side=tkinter.TOP)
 
         if len(data) > 0:
-            button_frame = tkinter.Frame(self.root)  # Create a frame to hold the buttons
+            button_frame = tkinter.Frame(self.root) 
             button_frame.pack(side=tkinter.TOP)
-
+        # Botones para cad uno de los equipos
         for equipo in data:
-            button = tkinter.Button(button_frame, text=equipo, command=lambda equipo=equipo: self.helloCallBack(equipo))
+            button = tkinter.Button(button_frame, text=equipo, command=lambda equipo=equipo: self.filtroCallBack(equipo))
             button.pack(side=tkinter.LEFT)
 
     
 
 
-    def helloCallBack(self,equipo):
+    def filtroCallBack(self,equipo):
         self.filtro= equipo
 
-    def visualization_example(self, frame):
-	    # Code for visualization plot
+    def team_map(self, frame):
+        """
+       Crea un mapa en 2D de los escaladores
+        """
         fig=plt.figure()
         fig = plt.figure(facecolor="#eaecf8")
         ax = fig.add_subplot()
@@ -123,9 +135,8 @@ class Dashboard:
         ax.set_xlim(-24000,24000)
         ax.set_ylim(-24000,24000)
         team_legend_handles = []
-                # code for plo
         def animate(i):
-                    # Clear the plot
+                    
             if self.filtro !=None:
                 ax.clear() 
                 new_points_x = []
@@ -135,6 +146,8 @@ class Dashboard:
                     new_points_y.append(self.data[self.filtro][escalador]['y'])
                 marker = self.team_styles[self.filtro]
                 color = self.team_colors[self.filtro]
+                #De los puntos obtenidos en las listas indicadas los mostramos con el metodo scatter
+                ax.scatter(new_points_x, new_points_y, c=color, marker=marker, alpha=0.5)
                 ax.scatter(new_points_x, new_points_y, c=color, marker=marker, alpha=0.5)
                 if self.filtro not in team_legend_handles:
                         team_legend_handles.append(Line2D([0], [0], marker=marker, color='w', markerfacecolor=color, markersize=10, label=self.filtro))
@@ -148,6 +161,7 @@ class Dashboard:
                         new_points_y.append(self.data[equipo][escalador]['y'])
                     marker = self.team_styles[equipo]
                     color = self.team_colors[equipo]
+                    #De los puntos obtenidos en las listas indicadas los mostramos con el metodo scatter
                     ax.scatter(new_points_x, new_points_y, c=color, marker=marker)
                     if equipo not in team_legend_handles:
                         team_legend_handles.append(Line2D([0], [0], marker=marker, color='w', markerfacecolor=color, markersize=10, label=equipo))
@@ -155,7 +169,7 @@ class Dashboard:
             ax.set_ylabel('Y')
             ax.set_title("Mapa de la montaña")
             fig.subplots_adjust(left=0.2, bottom=0.2) 
-        # Plot the circle
+        # mosstrrar el circulo
             theta = np.linspace(0, 2 * np.pi, 100)
             x = 23000 * np.cos(theta)
             y = 23000 * np.sin(theta)
@@ -167,8 +181,10 @@ class Dashboard:
         canvas = FigureCanvasTkAgg(fig, frame)
         canvas._tkcanvas.pack()
      
-    def visualization_example2(self, frame):
-        
+    def altruas_prom(self, frame):
+        """
+        Crea un grafico de barras de las alturas promedio de los escaladore 
+        """
 	    # Code for visualization plot
         fig=plt.figure()
         fig = plt.figure(facecolor='#eaecf8')
@@ -187,6 +203,7 @@ class Dashboard:
                     color = self.team_colors[self.filtro]   
                     bar = ax.bar(escalador, self.data[self.filtro][escalador]['z'], label=escalador, color = color )
                 self.puntosy[self.filtro]=sum(alturas)/len(alturas)
+                #Mostramos los z actuale
                 if self.puntosy[self.filtro]>top_promedio:
                     top_promedio=self.puntosy[self.filtro] 
                
@@ -201,6 +218,7 @@ class Dashboard:
                     alturas = []
                     for escalador in self.data[equipo]:
                         alturas.append(self.data[equipo][escalador]['z'])
+                    #Mostramos las alturaas promedio de los equipos
                     self.puntosy[equipo]=sum(alturas)/len(alturas)
                     if self.puntosy[equipo]>top_promedio:
                         top_promedio=self.puntosy[equipo]
@@ -216,8 +234,9 @@ class Dashboard:
         canvas = FigureCanvasTkAgg(fig, frame)
         canvas._tkcanvas.pack()
 
-    def visualization_example3(self, frame):
+    def altura_max(self, frame):
 	    # Code for visualization plot
+        """Crea un grafico de Barras con las alturas maxima obtenidas por lois equipos"""
         fig=plt.figure()
         fig = plt.figure(facecolor='#eaecf8')
         ax = fig.add_subplot()
@@ -234,6 +253,7 @@ class Dashboard:
                     if self.data[self.filtro][escalador]['z']> top_altura:
                         top_altura = self.data[self.filtro][escalador]['z']
                     alturas.append(top_altura)
+                    #Si tiene un filtro mostramos las altruras maxima de los escaladores
                     color = self.team_colors[self.filtro]   
                     bar = ax.bar(escalador, top_altura, label=escalador, color = color )
                 self.puntosy[self.filtro]=sum(alturas)/len(alturas)
@@ -247,6 +267,7 @@ class Dashboard:
                 for equipo in self.data:
                     altura_antes = 0
                     for escalador in self.data[equipo]:
+                        #Calculadmos las alturas maxiams de cada escaladorde cada equipo
                         if self.data[equipo][escalador]['z'] > altura_antes:
                             altura_antes = self.data[equipo][escalador]['z']
                     color = self.team_colors[equipo]  
@@ -254,9 +275,9 @@ class Dashboard:
                         top_altura=altura_antes  
                     bar = ax.bar(equipo,altura_antes, label=equipo, color = color )
 
-            ax.set_xlabel("Equipos")
-            ax.set_ylabel("Alturas") 
-            ax.set_title ("Alturas maximas")  
+                ax.set_xlabel("Equipos")
+                ax.set_ylabel("Alturas") 
+                ax.set_title ("Alturas maximas")  
             fig.subplots_adjust(left=0.2) 
         
         self.animations.append(FuncAnimation(fig, func=animate, interval=self.time_step, blit=False))
@@ -265,8 +286,8 @@ class Dashboard:
 
         canvas._tkcanvas.pack()
     
-    def visualization_example4(self, frame):
-	    # Code for visualization plot
+    def leaderboard(self, frame):
+        """Tabla con los 10 mejores escaladores"""
         fig=plt.figure()
         fig = plt.figure(facecolor='#eaecf8')
         ax = fig.add_subplot()
@@ -285,6 +306,7 @@ class Dashboard:
             if len(ganadores)<10:
                 for equipo in self.data:
                     for escalador in self.data[equipo]:
+                        #De los pganadores obtenidos chequeamos que no se hayan mostrado ya y solo agreamos los que no estan y los mostramos en una tabla
                         if self.data[equipo][escalador]['cima'] == True:
                             escalado_gano=False
                             for hiker in range(len(ganadores)):
@@ -302,8 +324,8 @@ class Dashboard:
         canvas = FigureCanvasTkAgg(fig, frame)
         canvas._tkcanvas.pack()
         
-    def visualization_example5(self, frame):
-	    # Code for visualization plot
+    def porjection3D(self, frame):
+        """Projection 3d de los escaladores """
         fig=plt.figure()
         fig = plt.figure(facecolor='#eaecf8')
         ax = fig.add_subplot(projection='3d')
@@ -315,6 +337,7 @@ class Dashboard:
                 new_points_y = []
                 new_points_z = []
                 for escalador in self.data[self.filtro]:
+                    #De los puntos obtenidos en las listas indicadas los mostramos con el metodo scatter
                     new_points_x.append(self.data[self.filtro][escalador]['x'])
                     new_points_y.append(self.data[self.filtro][escalador]['y'])
                     new_points_z.append(self.data[self.filtro][escalador]['z'])
@@ -328,6 +351,7 @@ class Dashboard:
                     new_points_y = []
                     new_points_z=[]
                     for escalador in self.data[equipo]:
+                        #De los puntos obtenidos en las listas indicadas los mostramos con el metodo scatter
                         new_points_x.append(self.data[equipo][escalador]['x'])
                         new_points_y.append(self.data[equipo][escalador]['y'])
                         new_points_z.append(self.data[equipo][escalador]['z'])
@@ -363,7 +387,39 @@ class Dashboard:
         self.root.quit()
 
 
+
+# Crear el parser de argumentos
+parser = argparse.ArgumentParser()
+
+# Agregar un argumento "--ip" al parser
+parser.add_argument("--ip", help="Dirección IP y puerto")
+
+# Obtener los argumentos de la línea de comandos
+args = parser.parse_args()
+
+# Acceder al valor del argumento "--ip"
+ip = args.ip
+
 if __name__ == "__main__":
+    while True:
+        if ip is None:
+            print("No direccion IP  ni puerto dados. Default localhost:8080")
+            ip = "localhost:8080"
+            ip, port = ip.split(":")
+        else:
+            print("La Ip y el Puerto dado son:", ip)
+            ip_parts = ip.split(":")
+            if len(ip_parts) != 2:
+                print("Formato invalido. Por favor envielo 'ip:puerto'")
+                ip = input("Escriba Ip:puerto: ")
+                continue
+            ip, port = ip_parts
+            if not port.isdigit():
+                print("Invalido numero de puerto. Por favor de un puerto valido")
+                ip = input("Escriba Ip:puerto: ")
+                continue
+            port = int(port)
+        break
     client = MountainClient('localhost', 8080)
     d = Dashboard(client)
     d.start()

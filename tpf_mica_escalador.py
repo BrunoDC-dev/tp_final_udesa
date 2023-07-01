@@ -3,6 +3,13 @@ import math
 pi = math.pi
 class Escalador :
     def __init__(self,nombre,cuadrante) -> None:
+        """
+        Constructor for Escalador class.
+
+        Args:
+            nombre (str): The name of the Escalador.
+            cuadrante (int): The quadrant in which the Escalador is located.
+        """
         self.nombre = nombre
         self.cuadrante=cuadrante 
         self.peligro=False
@@ -32,7 +39,6 @@ class Escalador :
         if self.iteraciones_hasta_salir_peligro>0:
    
                 self.iteraciones_hasta_salir_peligro-=1
-                #print("iteraciones" ,self.iteraciones_hasta_salir_peligro, "Angulo", self.calcular_angulo(posicion_x, posicion_y,self.points_to_go[0][0], self.points_to_go[0][1]))
                 return direccion
    
         else:
@@ -71,7 +77,7 @@ class Escalador :
     
     
     def calcular_direccion(self, inclinacion_x: float, inclinacion_y: float, posicion_x: float, 
-                            posicion_y: float,posicion_z: float) -> float:
+                            posicion_y: float) -> float:
         """
         Calcula la dirección en la que debe moverse el Escalador.
 
@@ -80,29 +86,22 @@ class Escalador :
             inclinacion_y (float): Inclinación en el eje y.
             posicion_x (float): Posición en el eje x.
             posicion_y (float): Posición en el eje y.
-            posicion_z (float): Posición en el eje z.
-            others_z (list[float]): Lista de posiciones en el eje z de otros escaladores.
 
         Returns:
             float: El ángulo en radianes para la dirección en la que debe moverse el Escalador.
         """
         if len(self.points_to_go) >0:
-            #print(self.points_to_go)
             self.punto_de_control(posicion_x,posicion_y)
         if len(self.points_to_go)==0:
-            #print("Estoy aca")
             new_point_x, new_point_y = self.puntos_en_circunferencia(22000)
             self.points_to_go.append([new_point_x,new_point_y])
         
         self.linea_de_fuego(posicion_x,posicion_y)
         if self.peligro:
-            #print(self.nombre, "etoy en peligro")
             return self.angulo_peligro(inclinacion_x,inclinacion_y, posicion_x,posicion_y)    
         
         if self.dispersarse>0:
-        
             self.dispersarse -=1
-           # print(self.nombre, " Me estoy dispersando")
             return self.calcular_angulo(posicion_x, posicion_y,self.points_to_go[0][0], self.points_to_go[0][1])
         
         else:
@@ -274,9 +273,21 @@ class Escalador :
       
         return x, y
     
-    def maximo_local (self, posicion_x, posicion_y  , inclinacion_x , inclinacion_y ):
+    def maximo_local (self, posicion_x:float, posicion_y:float  , inclinacion_x:float , inclinacion_y:float )->float:
+        
+        """
+    Calcula la dirección hacia el máximo local.
+
+    Args:
+        posicion_x (float): Posición en el eje x.
+        posicion_y (float): Posición en el eje y.
+        inclinacion_x (float): Inclinación en el eje x.
+        inclinacion_y (float): Inclinación en el eje y.
+
+    Returns:
+        float: El ángulo en radianes hacia el máximo local.
+        """
         direccion = self.calcular_angulo(posicion_x,posicion_y ,self.points_to_go[0][0], self.points_to_go[0][1])
-        print(direccion)
         if pi/2>direccion>=0:
             if inclinacion_x>0 and inclinacion_y>0:
                 return self.inclinacion(inclinacion_x,inclinacion_y)

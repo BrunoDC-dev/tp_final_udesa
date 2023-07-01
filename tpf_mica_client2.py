@@ -1,5 +1,5 @@
 from communication.client.client import MountainClient
-from escalador import Escalador
+from tpf_mica_escalador import Escalador
 import math
 import time
 import socket
@@ -22,20 +22,20 @@ ip = args.ip
 # Imprimir el valor del argumento "--ip"
 while True:
     if ip is None:
-        print("No IP address and port provided. Defaulting to localhost:8080")
+        print("No direccion IP  ni puerto dados. Default localhost:8080")
         ip = "localhost:8080"
         ip, port = ip.split(":")
     else:
-        print("The provided IP address and port are:", ip)
+        print("La Ip y el Puerto dado son:", ip)
         ip_parts = ip.split(":")
         if len(ip_parts) != 2:
-            print("Invalid IP address and port format. Please provide in the format 'address:port'")
-            ip = input("Enter the IP address and port: ")
+            print("Formato invalido. Por favor envielo 'ip:puerto'")
+            ip = input("Escriba Ip:puerto: ")
             continue
         ip, port = ip_parts
         if not port.isdigit():
-            print("Invalid port number. Please provide a valid port number.")
-            ip = input("Enter the IP address and port: ")
+            print("Invalido numero de puerto. Por favor de un puerto valido")
+            ip = input("Escriba Ip:puerto: ")
             continue
         port = int(port)
     break
@@ -59,15 +59,12 @@ def encontrar_entrada_con_cima(data: dict) -> tuple:
 while True:
     try:
         c = MountainClient(ip,int(port))
-        # Resto del código que depende de la conexión con el servidor
 
-        # Agregar equipos y escaladores
         c.add_team('B2', ['E1', 'E2', 'E3', 'E4'])
-        # Resto del código
 
         break  # Si la conexión es exitosa, salimos del bucle
 
-    except (ConnectionRefusedError, socket.gaierror):
+    except (ConnectionRefusedError, socket.gaierror,OSError):
         print("No se pudo establecer una conexión con el servidor. Asegúrate de que el servidor esté en funcionamiento y el puerto sea correcto.")
         print("IP y puerto proporcionados: ", ip, ":", port)
 
@@ -117,7 +114,6 @@ while not c.is_over():
     direccion = {}
     data = c.get_data()
     print(data)
-    #time.sleep(0.3)
     team, hiker = encontrar_entrada_con_cima(data)
     if hiker is None:
         for escalador in lista_escaladores:
@@ -128,7 +124,6 @@ while not c.is_over():
                     data['B2'][escalador.nombre]['inclinacion_y'],
                     data['B2'][escalador.nombre]['x'],
                     data['B2'][escalador.nombre]['y'],
-                    data['B2'][escalador.nombre]['z'],
                     ),
                 'speed': velocidad}
     else:
@@ -141,7 +136,6 @@ while not c.is_over():
                         data['B2'][escalador.nombre]['inclinacion_y'],
                         data['B2'][escalador.nombre]['x'],
                         data['B2'][escalador.nombre]['y'],
-                        data['B2'][escalador.nombre]['z'],
                         ),
                     'speed': velocidad}
             else:
